@@ -8,11 +8,12 @@ angular.module('converter.services', [])
 
   // Some fake testing data
   var units = [
-    { id: 0, name: 'Bananas', type: "Universal" },
-    { id: 1, name: 'Centimeters', type: "Metric" },
-    { id: 2, name: 'Inches', type: "Imperial" },
-    { id: 3, name: 'Feet', type: "Imperial" },
-    { id: 4, name: 'Meters', type: "Metric" }
+    { id: 0, name: 'bananas', type: "Universal" },
+    { id: 1, name: 'centimeters', type: "Metric" },
+    { id: 1, name: 'millimeters', type: "Metric" },
+    { id: 2, name: 'inches', type: "Imperial" },
+    { id: 3, name: 'feet', type: "Imperial" },
+    { id: 4, name: 'meters', type: "Metric" }
   ];
   // var qties = new Qty('m');
 
