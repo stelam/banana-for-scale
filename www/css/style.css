@@ -1,9 +1,14 @@
 /* Empty. Add your own CSS if you like */
 input {text-align: center}
 .unit-list > label {height: 57px; padding: 0px;}
-.unit-list select {position: static; direction:ltr; width: 100%; max-width:  none; padding-top: 16px;}
+.unit-list > label.big {height: 114px;}
+.unit-list select {position: static; direction:ltr; width: 100%; max-width:  none; padding-top: 16px; padding-right: 16px;}
 
-.button-convert.to, .button-convert.to:hover {margin: 0px!important; height: 51px; color:#444; background: none; border: none; min-height: 0px; height: 20px; line-height: 4px;}
+
+.row.first {margin-top: 10px;}
+
+.button-convert.to, .button-convert.to:hover {margin: 0px auto!important; height: 51px; color:#444; background: none; border: none; min-height: 0px; height: 20px; min-width: 0px; width: 30px; color: #666; line-height: 4px;}
+.button-convert.to i {position: absolute; top: -8px; left: 8px;}
 
 .fake {position: absolute; background: red; opacity: 0; }
 
@@ -16,6 +21,9 @@ input {text-align: center}
 	position: relative;
 	top:-1px;
 	height: 57px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .result {
@@ -29,3 +37,29 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+.wipe-input {font-size: 18px; cursor: pointer;
+height: 55px;
+position: absolute;
+right: 9px;
+top: 0px;
+padding-top: 20px;
+padding-bottom: 20px;
+/* background: red; */
+width: 20px;
+text-align: center;
+}
+
+.button-history {margin: 0px 0px 0px 10px;}
+.history {margin-top: 0px;}
+.history .item {font-size: 13px;}
+.hide-history {border-bottom: none;}
+.item-history i.icon {font-size: 21px; color: #666;}
+.bar-footer .button-search {padding: 0px;}
+
+
+[label]{font-weight: bold;color: #444; }
+[label] option {font-weight: normal;}
+
+.unit-list label { text-indent: 20px;}
+.unit-list .item-divider {font-weight: normal; background: #e5e5e5;}
