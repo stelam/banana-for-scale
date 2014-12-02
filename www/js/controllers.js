@@ -1,6 +1,6 @@
 angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter'])
 
-.controller('ConvertCtrl', function($scope, $rootScope, Units, ConversionLocalStorageService, $timeout, $ionicActionSheet, $cordovaSplashscreen, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
+.controller('ConvertCtrl', function($scope, $rootScope, Units, ConversionLocalStorageService, $timeout, $ionicActionSheet, $cordovaSplashscreen, $ionicPopup, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
   $scope.units = Units.all();
   $scope.result = {value: "", value2 : ""};
   $scope.base = {value : "", value2 : "", lastValue : 0};
@@ -58,6 +58,7 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 
 
   $scope.init = function(){
+
     try{
       $cordovaNetwork.getNetwork();
       $scope.mobile = true;
@@ -253,9 +254,36 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
   	} 
   	catch (exception){
       $scope.client.setText(value.toString());
-      console.log($scope.client);
-  		console.log("Failed to copy '" + value + "'");
-  		console.log(exception);
+
+      if (ionic.Platform.isAndroid()) {
+
+       var confirmPopup = $ionicPopup.confirm({
+         title: "Can't copy that",
+         template: "Your browser doesn't support copying text, but the free Android app does! Would you like to download it?"
+       });
+       confirmPopup.then(function(res) {
+         if(res) {
+           window.open("http://play.google.com/store/apps/details?id=com.bananaforscale");
+         } else {
+           console.log('You are not sure');
+         }
+       });
+
+      }
+
+      if (ionic.Platform.isIOS()) {
+
+        var alertPopup = $ionicPopup.alert({
+         title: "Can't copy that",
+         template: 'Copy is not available on mobile browser. Never fear, iOS app is coming soon!'
+        });
+        alertPopup.then(function(res) {
+         console.log('Thank you for not eating my delicious ice cream cone');
+        });
+
+      }
+
+
   	}
   }
 
