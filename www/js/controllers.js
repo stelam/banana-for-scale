@@ -246,13 +246,14 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 
 
   $scope.copyToClipboard = function(value){
+
   	try{
   		cordova.plugins.clipboard.copy(value);
   		$cordovaToast.showShortTop("'" + value + "' copied to clipboard");
   	} 
   	catch (exception){
-      
-      $scope.client.setText(value);
+      $scope.client.setText(value.toString());
+      console.log($scope.client);
   		console.log("Failed to copy '" + value + "'");
   		console.log(exception);
   	}
