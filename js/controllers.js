@@ -9,6 +9,7 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
   $scope.conversion = {}
   $scope.historyVisible = false;
   $scope.search = {value : ""};
+  $scope.mobile = true;
   $scope.ConversionModel = ConversionModel;
   ConversionLocalStorageService.loadHistory($scope);
 
@@ -57,6 +58,13 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 
 
   $scope.init = function(){
+    try{
+      $cordovaNetwork.getNetwork();
+      $scope.mobile = true;
+    } catch(exception){
+      $scope.mobile = false;
+    }
+
     $ionicModal.fromTemplateUrl('modal-units.html', {
       scope: $scope,
       animation: 'slide-in-up'
@@ -84,6 +92,7 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
       e.preventDefault();
       return false;
     },101);
+
 
   }
 
@@ -193,32 +202,42 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 
   $scope.resultContextualMenu = function(conversion){
   	if (conversion.resultUnit == "feet and inches") {
-		buttons = [
-			{ text: 'Copy result value and units to clipboard', copyValue : ConversionModel.rightSideToString(conversion), action : $scope.copyToClipboard },
-			{ text: 'Copy conversion to clipboard', copyValue : ConversionModel.toString(conversion), action : $scope.copyToClipboard }
-		]
-  	} else{
-		buttons = [
-			{ text: 'Copy result value to clipboard', copyValue : conversion.resultValue, action : $scope.copyToClipboard },
-			{ text: 'Copy result value and units to clipboard', copyValue : ConversionModel.resultValueAndUnitString(conversion), action : $scope.copyToClipboard },
-			{ text: 'Copy conversion to clipboard', copyValue : ConversionModel.toString(conversion), action : $scope.copyToClipboard }
-		]
+  		buttons = [
+  			{ text: 'Copy result value and units to clipboard', copyValue : ConversionModel.rightSideToString(conversion), action : $scope.copyToClipboard, id : "convert" },
+  			{ text: 'Copy conversion to clipboard', copyValue : ConversionModel.toString(conversion), action : $scope.copyToClipboard }
+  		]
+    	} else{
+  		buttons = [
+  			{ text: 'Copy result value to clipboard', copyValue : conversion.resultValue, action : $scope.copyToClipboard },
+  			{ text: 'Copy result value and units to clipboard', copyValue : ConversionModel.resultValueAndUnitString(conversion), action : $scope.copyToClipboard },
+  			{ text: 'Copy conversion to clipboard', copyValue : ConversionModel.toString(conversion), action : $scope.copyToClipboard }
+  		]
   	}
 
   	try{
-		var hideSheet = $ionicActionSheet.show({
-			buttons : buttons,
-			titleText: ConversionModel.toString(conversion),
-			cancelText: 'Cancel',
+  		var hideSheet = $ionicActionSheet.show({
+  			buttons : buttons,
+  			titleText: ConversionModel.toString(conversion),
+  			cancelText: 'Cancel',
 
-			cancel: function() {
-			  // add cancel code..
-			},
-			buttonClicked: function(index, button) {
-				button.action(button.copyValue);
-				return true;
-			}
-		});
+  			cancel: function() {
+  			  // add cancel code..
+  			},
+  			buttonClicked: function(index, button) {
+  				button.action(button.copyValue);
+  				return true;
+  			}
+  		});
+
+      if (!$scope.mobile){
+        
+        $timeout(function(){
+          //console.log(document.querySelector('.action-sheet-title'));
+          var copyEl = angular.element( document.querySelectorAll( '.action-sheet-group .button' ) );
+          $scope.client = new ZeroClipboard( copyEl );
+
+        }, 200)
+      }
   	}
   	catch (exception){
   		console.log(exception);
@@ -232,6 +251,8 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
   		$cordovaToast.showShortTop("'" + value + "' copied to clipboard");
   	} 
   	catch (exception){
+      
+      $scope.client.setText(value);
   		console.log("Failed to copy '" + value + "'");
   		console.log(exception);
   	}
