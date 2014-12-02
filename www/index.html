@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title></title>
+    <title>Banana for scale - Universal converter</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -21,28 +21,23 @@
 
     <!-- your app's js -->
     <script src="lib/js-quantities/src/quantities.js"></script>
+    <script src="lib/zeroclipboard/dist/ZeroClipboard.min.js"></script>
     <script src="lib/angular-local-storage/dist/angular-local-storage.min.js"></script>
     <script src="lib/angular-filter/dist/angular-filter.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
-    <script type="text/javascript" charset="utf-8">
-      document.addEventListener("deviceready", onDeviceReady, false);
-      function onDeviceReady() {
-        //navigator.splashscreen.show();
-      }
-    </script>
     
   </head>
-  <body ng-app="scale">
+  <body ng-app="scale" ng-controller="ConvertCtrl" ng-class="mobile == false ? 'not-mobile' : 'mobile'">
 
   
 
-    <ion-side-menus>
+    <ion-side-menus >
       <!-- Center content -->
-      <ion-side-menu-content ng-controller="ConvertCtrl" drag-content="false">
+      <ion-side-menu-content drag-content="false" >
         <ion-pane>
-          <ion-header-bar class="bar-stable">
+          <ion-header-bar class="bar-stable app-header">
             <h1 class="title">Banana for scale</h1>
           </ion-header-bar>
           <ion-content>
@@ -122,8 +117,19 @@
                 <i class="icon ion-android-more"></i>
               </a>
           </div>
+
+
           </ion-content>
+          <div ng-if="!mobile" class="market-links">
+            <a title="Banana for scale - Android app" href="http://play.google.com/store/apps/details?id=com.bananaforscale" target="_blank">
+              <img src="img/android.png"/>
+            </a>
+          </div>
+
         </ion-pane>
+
+
+
       </ion-side-menu-content>
 
       <!-- Left menu -->
@@ -131,7 +137,21 @@
         a
       </ion-side-menu>
 
+
+
+
     </ion-side-menus>
+
+    <div id="clip" ng-if="!mobile"></div>
+
+    <div id="clouds" ng-if="!mobile"> 
+      <div class="cloud rotating x1"></div> 
+      <div class="cloud rotating x2"></div> 
+      <div class="cloud rotating x3"></div> 
+      <div class="cloud rotating x4"></div> 
+      <div class="cloud rotating x5"></div> 
+    </div>  
+
 
   </body>
 </html>

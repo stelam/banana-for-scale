@@ -63,3 +63,127 @@ text-align: center;
 
 .unit-list label { text-indent: 20px;}
 .unit-list .item-divider {font-weight: normal; background: #e5e5e5;}
+
+.not-mobile ion-side-menus {max-width: 960px; margin: auto; border:1px solid #e5e5e5; margin-top: 20px; opacity: 0.98;}
+.not-mobile .app-header {border: 1px solid #b2b2b2; }
+.not-mobile .modal {max-width: 600px !important; margin: auto; }
+.not-mobile .action-sheet {max-width: 600px;
+margin: auto;}
+
+.market-links {position: fixed; text-align: right; width: 100%; bottom: 24px;
+right: 10px; width: 129px;}
+
+.global-zeroclipboard-container {pointer-events: auto;}
+
+/*Lets start with the cloud formation rather*/ 
+
+/*The container will also serve as the SKY*/ 
+
+
+body { 
+    /*To hide the horizontal scroller appearing during the animation*/ 
+    overflow: hidden; 
+} 
+
+#clouds{ 
+    padding: 100px 0; 
+    background: #c9dbe9; 
+    background: -webkit-linear-gradient(top, #c9dbe9 0%, #fff 100%); 
+    background: -linear-gradient(top, #c9dbe9 0%, #fff 100%); 
+    background: -moz-linear-gradient(top, #c9dbe9 0%, #fff 100%); 
+} 
+
+/*Time to finalise the cloud shape*/ 
+.cloud { 
+    width: 200px; height: 60px; 
+    background: url("../img/banana.png") 100% 100% no-repeat; 
+    background-size: contain;
+     
+    position: relative;  
+} 
+
+
+
+/*Time to animate*/ 
+.x1 { 
+    -webkit-animation: moveclouds 15s linear infinite; 
+    -moz-animation: moveclouds 15s linear infinite; 
+    -o-animation: moveclouds 15s linear infinite; 
+    transform: rotate(65deg);
+    -webkit-transform: rotate(65deg);
+} 
+
+/*variable speed, opacity, and position of clouds for realistic effect*/ 
+.x2 { 
+    left: 200px; 
+     
+    -webkit-transform: scale(0.6); 
+    -moz-transform: scale(0.6); 
+    transform: scale(0.6); 
+    opacity: 0.6; /*opacity proportional to the size*/ 
+     
+    /*Speed will also be proportional to the size and opacity*/ 
+    /*More the speed. Less the time in 's' = seconds*/ 
+    -webkit-animation: moveclouds 25s linear infinite; 
+    -moz-animation: moveclouds 25s linear infinite; 
+    -o-animation: moveclouds 25s linear infinite; 
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+} 
+
+.x3 { 
+    left: -250px; top: -200px; 
+     
+    -webkit-transform: scale(0.8); 
+    -moz-transform: scale(0.8); 
+    transform: scale(0.8); 
+    opacity: 0.8; /*opacity proportional to the size*/ 
+     
+    -webkit-animation: moveclouds 20s linear infinite; 
+    -moz-animation: moveclouds 20s linear infinite; 
+    -o-animation: moveclouds 20s linear infinite; 
+    transform: rotate(425deg);
+    -webkit-transform: rotate(425deg);
+
+} 
+
+.x4 { 
+    left: 470px; top: -250px; 
+     
+    -webkit-transform: scale(0.75); 
+    -moz-transform: scale(0.75); 
+    transform: scale(0.75); 
+    opacity: 0.75; /*opacity proportional to the size*/ 
+     
+    -webkit-animation: moveclouds 18s linear infinite; 
+    -moz-animation: moveclouds 18s linear infinite; 
+    -o-animation: moveclouds 18s linear infinite; 
+    transform: rotate(125deg);
+    -webkit-transform: rotate(125deg);
+} 
+
+.x5 { 
+    left: -150px; top: -150px; 
+     
+    -webkit-transform: scale(0.8); 
+    -moz-transform: scale(0.8); 
+    transform: scale(0.8); 
+    opacity: 0.8; /*opacity proportional to the size*/ 
+     
+    -webkit-animation: moveclouds 20s linear infinite; 
+    -moz-animation: moveclouds 20s linear infinite; 
+    -o-animation: moveclouds 20s linear infinite; 
+    transform: rotate(95deg);
+    -webkit-transform: rotate(95deg);
+} 
+
+keyframes moveclouds { 
+    0% {margin-left: 2200px;} 
+    100% {margin-left: -1000px; transform: rotate(360deg);} 
+} 
+@-webkit-keyframes moveclouds { 
+    0% {margin-left: 2200px; } 
+    100% {margin-left: -1000px; -webkit-transform: rotate(360deg);} 
+} 
+
+
