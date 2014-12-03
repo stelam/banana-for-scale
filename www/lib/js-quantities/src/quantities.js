@@ -82,7 +82,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     "<light-minute>":[["lmin","light-minute"], 17987550000, "length", ["<meter>"]],
     "<light-year>" : [["ly","light-year"], 9460528000000000, "length", ["<meter>"]],
     "<parsec>"  : [["pc","parsec","parsecs"], 30856780000000000, "length", ["<meter>"]],
-    "<banana>"  : [["bananas"], 0.1905, "length", ["<meter>"]],
+    "<banana>"  : [["bananas"], 0.178, "length", ["<meter>"]],
     "<foot-inch>"  : [["feet and inches"], 0.0254, "length", ["<meter>"]],
 
     /* mass */
