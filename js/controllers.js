@@ -1,6 +1,6 @@
 angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter'])
 
-.controller('ConvertCtrl', function($scope, $rootScope, Units, ConversionLocalStorageService, $timeout, $ionicActionSheet, $cordovaSplashscreen, $ionicPopup, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
+.controller('ConvertCtrl', function($scope, $rootScope, Units, ConversionLocalStorageService, $location, $timeout, $ionicActionSheet, $cordovaSplashscreen, $ionicPopup, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
   $scope.units = Units.all();
   $scope.result = {value: "", value2 : ""};
   $scope.base = {value : "", value2 : "", lastValue : 0};
@@ -11,6 +11,8 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
   $scope.search = {value : ""};
   $scope.mobile = true;
   $scope.ConversionModel = ConversionModel;
+
+
   ConversionLocalStorageService.loadHistory($scope);
 
   ConversionLocalStorageService.loadLastUsedUnits($scope).then(function(){}, function(error){
@@ -21,6 +23,7 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
     Units.getByName("bananas").then(function(unit){
       $scope.result.unit = unit;
     });
+
   })
 
 
@@ -31,6 +34,7 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 
   $scope.convert = function(){
 
+    
   	if ($scope.base.value != ""){
 	  	
 	  	try {
@@ -42,6 +46,11 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 		  	ConversionLocalStorageService.addToConversionHistory($scope).then(function(conversionHistory){
 		  		$ionicScrollDelegate.resize();
 		  		$scope.conversion = conversionHistory[0];
+
+          var hash = "convert-" +  $scope.base.value + "-" + $scope.base.value2 + "-" + $scope.base.unit.name + "-" + $scope.result.unit.name;
+          $location.hash(hash);
+
+          
 		  	});
 
 	  	} catch (exception){
@@ -58,6 +67,32 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 
 
   $scope.init = function(){
+    var params = decodeURIComponent(document.location.hash);
+    params = params.split("-");
+    console.log(params);
+    try {
+      if (params[0] == "##convert") {
+
+        $scope.base.value = decodeURIComponent(params[1]);
+        $scope.base.value2 = decodeURIComponent(params[2]);
+
+        Units.getByName((params[3])).then(function(unit){
+          $scope.base.unit = unit;
+
+          Units.getByName((params[4])).then(function(unit2){
+            $scope.result.unit = unit2;
+            
+            $timeout(function(){
+              $scope.convert();
+            }, 500);
+          });
+
+        });
+      }
+    } catch (exception) {
+      console.log("bad params");
+    }
+
 
     try{
       $cordovaNetwork.getNetwork();

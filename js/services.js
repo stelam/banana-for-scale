@@ -174,7 +174,7 @@ angular.module('converter.services', ['LocalStorageModule'])
       var baseQtyFeet = new Qty(scope.base.value + "feet");
       if (scope.base.value2 == "") scope.base.value2 = 0;
       var baseQtyInches = new Qty(scope.base.value2 + "inches");
-      console.log(scope.base.value2)
+       console.log("in")
 
       var totalQtyInches = new Qty(baseQtyFeet.to("inches").scalar + baseQtyInches.scalar + "inches");
 
