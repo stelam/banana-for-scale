@@ -1,6 +1,6 @@
-angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter'])
+angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 
-.controller('ConvertCtrl', function($scope, $rootScope, Units, ConversionLocalStorageService, $location, $timeout, $ionicActionSheet, $cordovaSplashscreen, $ionicPopup, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
+.controller('ConvertCtrl', function($scope, $rootScope, $route, Units, ConversionLocalStorageService, $location, $timeout, $ionicActionSheet, $cordovaSplashscreen, $ionicPopup, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
   $scope.units = Units.all();
   $scope.result = {value: "", value2 : ""};
   $scope.base = {value : "", value2 : "", lastValue : 0};
@@ -47,13 +47,19 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
 		  		$ionicScrollDelegate.resize();
 		  		$scope.conversion = conversionHistory[0];
 
-          var hash = "convert-" +  $scope.base.value + "-" + $scope.base.value2 + "-" + $scope.base.unit.name + "-" + $scope.result.unit.name;
-          $location.hash(hash);
+          if ($scope.base.value2 > 0)
+            var url = "convert/" +  $scope.base.value + "_" + $scope.base.value2 + "/" + $scope.base.unit.name + "/" + $scope.result.unit.name;
+          else
+            var url = "convert/" +  $scope.base.value + "/" + $scope.base.unit.name + "/" + $scope.result.unit.name;
+
+          url = url.replace(/\s+/g, '-').toLowerCase();
+          $location.path(url);
 
           
 		  	});
 
 	  	} catch (exception){
+        console.log(exception);
 	  		try {
 	  			$cordovaToast.showShortTop('Invalid value');
 	  		} catch (exception2){
@@ -66,33 +72,33 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
   }
 
 
-  $scope.init = function(){
-    var params = decodeURIComponent(document.location.hash);
-    params = params.split("-");
-    console.log(params);
+  $scope.$on('$routeChangeSuccess', function (ev, current, prev) {
+
     try {
-      if (params[0] == "##convert") {
+      var baseValues = $route.current.params.baseValue.split("_");
 
-        $scope.base.value = decodeURIComponent(params[1]);
-        $scope.base.value2 = decodeURIComponent(params[2]);
+      $scope.base.value = baseValues[0];
+      $scope.base.value2 = (baseValues.length > 1) ? baseValues[1] : 0;
 
-        Units.getByName((params[3])).then(function(unit){
-          $scope.base.unit = unit;
+      Units.getByName($route.current.params.baseUnit.replace(/-/g, ' ')).then(function(unit){
+        $scope.base.unit = unit;
 
-          Units.getByName((params[4])).then(function(unit2){
-            $scope.result.unit = unit2;
-            
-            $timeout(function(){
-              $scope.convert();
-            }, 500);
-          });
-
+        Units.getByName($route.current.params.resultUnit.replace(/-/g, ' ')).then(function(unit2){
+          $scope.result.unit = unit2;
+          $timeout(function(){
+            $scope.convert();
+          }, 500);
         });
-      }
+      });
+
     } catch (exception) {
       console.log("bad params");
     }
 
+
+  });
+
+  $scope.init = function(){
 
     try{
       $cordovaNetwork.getNetwork();
@@ -138,7 +144,6 @@ angular.module('converter.controllers', ['ionic', 'ngCordova', 'angular.filter']
     $scope.currentUnit = (side == 'base') ? $scope.base.unit : $scope.result.unit;
     $scope.currentUnit.side = side;
     $scope.search.value = "";
-    console.log($scope.currentUnit);
     $scope.modal.show();
 
   }
