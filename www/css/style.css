@@ -50,6 +50,13 @@ width: 20px;
 text-align: center;
 }
 
+.description{
+	max-width: 800px;
+	margin: auto;
+	height: auto;
+	padding: 10px;
+}
+
 .button-history {margin: 0px 0px 0px 10px;}
 .history {margin-top: 0px;}
 .history .item {font-size: 13px;}
