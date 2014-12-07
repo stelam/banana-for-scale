@@ -47,6 +47,7 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 		  	ConversionModel.setResult($scope);
 
 		  	ConversionLocalStorageService.addToConversionHistory($scope).then(function(conversionHistory){
+          console.log($scope.conversionHistory);
 		  		$ionicScrollDelegate.resize();
 		  		$scope.conversion = conversionHistory[0];
 
@@ -92,7 +93,6 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
           if ($scope.firstRun){
             $scope.firstRun = false;
             $timeout(function(){
-              if ($scope.base.value2 == null) $scope.base.value2 = 0;
               $scope.convert();
             }, 500);
           }
@@ -206,7 +206,7 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 
     $scope.units = Units.allByType(name);
     $scope.kind = name;
-    ConversionLocalStorageService.loadHistory($scope);
+    //ConversionLocalStorageService.loadHistory($scope);
 
     if (wipe){
       $scope.wipeBaseInput("base-input")
@@ -217,7 +217,9 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
     ConversionLocalStorageService.saveLastUsedKind($scope);
 
     ConversionLocalStorageService.loadLastUsedUnits($scope).then(function(){}, function(error){
+      console.log("in");
       Units.getDefaults($scope.kind).then(function(defaultUnits){
+        console.log(defaultUnits);
         $scope.base.unit = defaultUnits[0];
         $scope.result.unit = defaultUnits[1]; 
       });
