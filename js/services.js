@@ -5,34 +5,52 @@ angular.module('converter.services', ['LocalStorageModule'])
  */
 .factory('Units', function($q) {
   // Might use a resource here that returns a JSON array
+  var units ={
+    length : [
+      { name: 'bananas', id: 'banana-length', type: "Universal units", typeId: 0, symbol : 'bn' },
+      { name: 'inches', id: 'inches', type: "Imperial units", typeId: 1, symbol : 'in'},
+      { name: 'feet', id: 'feet', type: "Imperial units", typeId: 1, symbol : 'ft' },
+      { name: 'feet and inches', id: 'feet and inches', type: "Imperial units", typeId: 1, symbol : 'ft in' },
+      { name: 'yards', id: 'yards', type: "Imperial units", typeId: 1, symbol : 'yd' },
+      { name: 'miles', id: 'miles', type: "Imperial units", typeId: 1, symbol : 'mi' },
+      { name: 'millimeters', id: 'millimeters', type: "Metric units", typeId: 2, symbol : 'mm' },
+      { name: 'centimeters', id: 'centimeters', type: "Metric units", typeId: 2, symbol : 'cm' },
+      { name: 'meters', id: 'meters', type: "Metric units", typeId: 2, symbol : 'm' },
+      { name: 'kilometers', id: 'kilometers', type: "Metric units", typeId: 2, symbol : 'km' }
+    ], 
 
-  // Some fake testing data
-  var units = [
-    { name: 'bananas', type: "Universal units", typeId: "0", symbol : 'bn' },
-    { name: 'inches', type: "Imperial units", typeId: "1", symbol : 'in'},
-    { name: 'feet', type: "Imperial units", typeId: 1, symbol : 'ft' },
-    { name: 'feet and inches', type: "Imperial units", typeId: 1, symbol : 'ft in' },
-    { name: 'yards', type: "Imperial units", typeId: 1, symbol : 'yd' },
-    { name: 'miles', type: "Imperial units", typeId: 1, symbol : 'mi' },
-    { name: 'millimeters', type: "Metric units", typeId: 2, symbol : 'mm' },
-    { name: 'centimeters', type: "Metric units", typeId: 2, symbol : 'cm' },
-    { name: 'meters', type: "Metric units", typeId: 2, symbol : 'm' },
-    { name: 'kilometers', type: "Metric units", typeId: 2, symbol : 'km' }
-  ];
+    mass : [
+      { name: 'bananas', id: 'banana-mass', type: "Universal units", typeId: 0, symbol : 'bn' },
+      { name: 'ounces', id: 'ounces', type: "Imperial units", typeId: 1, symbol : 'oz'},
+      { name: 'pounds', id: 'pounds', type: "Imperial units", typeId: 1, symbol : 'lbs'},
+      { name: 'short tons', id: 'short tons', type: "Imperial units", typeId: 1, symbol : 'tons'},
+      { name: 'grams', id: 'grams', type: "Metric units", typeId: 2, symbol : 'g'},
+      { name: 'kilograms', id: 'kilograms', type: "Metric units", typeId: 2, symbol : 'kg'},
+      { name: 'metric tons', id: 'metric tons', type: "Metric units", typeId: 2, symbol : 't'}
+    ]
+  };
+
   // var qties = new Qty('m');
 
-  return {
-    all: function() {
+  
+  var all = function() {
       return units;
-    },
-    get: function(unitId) {
+    }
+
+  var allByType = function(type){
+      return units[type];
+    }
+
+  var get = function(unitId) {
       // Simple index lookup
       return units[unitId];
-    },
-    getByName: function(unitName){
+    }
+
+  var getByName = function(unitName, type){
+
       var deferred = $q.defer();
       var found = false;
-      units.some(function(u){
+      units[type].some(function(u){
         if (u.name == unitName){
           found = true;
           deferred.resolve(u);
@@ -41,6 +59,30 @@ angular.module('converter.services', ['LocalStorageModule'])
       if (!found) deferred.reject("Unit " + unitName + " doesn't exist.");
       return deferred.promise;
     }
+
+  var getDefaults = function(type){
+      var defaults = [];
+      var deferred = $q.defer();
+
+      if (type == "length"){
+        getByName('inches', type).then(function(unit){defaults[0] = unit})
+        getByName('bananas', type).then(function(unit){defaults[1] = unit; deferred.resolve(defaults)})
+      }
+      if (type == "weight"){
+        getByName('pounds', type).then(function(unit){defaults[0] = unit})
+        getByName('bananas', type).then(function(unit){defaults[1] = unit; deferred.resolve(defaults)})
+      }
+
+      return deferred.promise;
+
+    }
+  
+  return {
+    all:all,
+    allByType:allByType,
+    get:get,
+    getByName:getByName,
+    getDefaults:getDefaults
   }
 })
 
@@ -53,20 +95,24 @@ angular.module('converter.services', ['LocalStorageModule'])
     var deferred = $q.defer();
 
     var conversion = {
-      baseValue : scope.base.value,
-      baseValue2 : scope.base.value2,
+      baseValue : parseFloat(scope.base.value),
+      baseValue2 : parseFloat(scope.base.value2),
       baseUnit : scope.base.unit.name,
-      resultValue : scope.result.value,
-      resultValue2 : scope.result.value2,
+      resultValue : parseFloat(scope.result.value),
+      resultValue2 : parseFloat(scope.result.value2),
       resultUnit : scope.result.unit.name,
       kindName : scope.kind
     };
-
+    
     var conversionHistory = localStorageService.get('conversionHistory');
 
+    //console.log(JSON.stringify(conversionHistory[conversion.kindName][0]));
+    //console.log(JSON.stringify(conversion))
     /* Do not add if last conversion is the same as the new one */
-    if (JSON.stringify(conversionHistory[conversion.kindName][0]) != JSON.stringify(conversion))
+    if (JSON.stringify(conversionHistory[conversion.kindName][0]) != JSON.stringify(conversion)){
       conversionHistory[conversion.kindName].unshift(conversion);
+    }
+
 
     if (conversionHistory[conversion.kindName].length > 10)
       conversionHistory[conversion.kindName].pop();
@@ -82,6 +128,7 @@ angular.module('converter.services', ['LocalStorageModule'])
   };
 
   factory.loadHistory = function(scope){
+
     /* Check if history is already set conversions in localStorage */
     if (!localStorageService.get('conversionHistory')){
       localStorageService.set('conversionHistory', {});
@@ -100,24 +147,39 @@ angular.module('converter.services', ['LocalStorageModule'])
   };
 
   factory.saveLastUsedBaseUnit = function(scope){
-    localStorageService.set('lastUsedBaseUnit', scope.base.unit);
+    localStorageService.set('lastUsedBaseUnit_'+scope.kind, scope.base.unit);
   };
 
   factory.saveLastUsedResultUnit = function(scope){
-    localStorageService.set('lastUsedResultUnit', scope.result.unit);
+    localStorageService.set('lastUsedResultUnit_'+scope.kind, scope.result.unit);
   }
 
   factory.loadLastUsedUnits = function(scope){
     var deferred = $q.defer();
 
-    if (!localStorageService.get('lastUsedBaseUnit') || !localStorageService.get('lastUsedResultUnit')){
+    if (!localStorageService.get('lastUsedBaseUnit_'+scope.kind) || !localStorageService.get('lastUsedResultUnit_'+scope.kind)){
       deferred.reject(false);
     } else {
-      scope.base.unit = localStorageService.get('lastUsedBaseUnit');
-      scope.result.unit = localStorageService.get('lastUsedResultUnit');
+      scope.base.unit = localStorageService.get('lastUsedBaseUnit_'+scope.kind);
+      scope.result.unit = localStorageService.get('lastUsedResultUnit_'+scope.kind);
       deferred.resolve(true);
     }
 
+    return deferred.promise;
+  }
+
+  factory.saveLastUsedKind = function(scope){
+    localStorageService.set('lastUsedKind', scope.kind);
+  }
+
+  factory.loadLastUsedKind = function(scope){
+    var deferred = $q.defer();
+    if (!localStorageService.get('lastUsedKind'))
+      deferred.reject(false);
+    else{
+      scope.kind = localStorageService.get('lastUsedKind');
+      deferred.resolve(true);
+    }
     return deferred.promise;
   }
 
@@ -182,7 +244,7 @@ angular.module('converter.services', ['LocalStorageModule'])
 
     } else {
       try {
-        return Qty(scope.base.value + " " + scope.base.unit.name);
+        return Qty(scope.base.value + " " + scope.base.unit.id);
       } catch (exception){
         return exception;
       }
@@ -198,6 +260,8 @@ angular.module('converter.services', ['LocalStorageModule'])
 
       scope.result.value = parseFloat(0+qtyFeet.scalar);
       scope.result.value2 = qtyInches.scalar;
+    } else {
+      scope.result.value2 = 0;
     }
 
     if (scope.result.value < 0.01 && scope.result.value > 0 || scope.result.value > 9999999999)
