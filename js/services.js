@@ -68,9 +68,9 @@ angular.module('converter.services', ['LocalStorageModule'])
         getByName('inches', type).then(function(unit){defaults[0] = unit})
         getByName('bananas', type).then(function(unit){defaults[1] = unit; deferred.resolve(defaults)})
       }
-      if (type == "weight"){
+      if (type == "mass"){
         getByName('pounds', type).then(function(unit){defaults[0] = unit})
-        getByName('bananas', type).then(function(unit){defaults[1] = unit; deferred.resolve(defaults)})
+        getByName('bananas', type).then(function(unit){defaults[1] = unit; deferred.resolve(defaults);})
       }
 
       return deferred.promise;
@@ -103,25 +103,27 @@ angular.module('converter.services', ['LocalStorageModule'])
       resultUnit : scope.result.unit.name,
       kindName : scope.kind
     };
+
+    if (!conversion.baseValue2) conversion.baseValue2 = 0;
     
     var conversionHistory = localStorageService.get('conversionHistory');
 
-    //console.log(JSON.stringify(conversionHistory[conversion.kindName][0]));
-    //console.log(JSON.stringify(conversion))
+    console.log(JSON.stringify(conversionHistory[0]));
+    console.log(JSON.stringify(conversion))
     /* Do not add if last conversion is the same as the new one */
-    if (JSON.stringify(conversionHistory[conversion.kindName][0]) != JSON.stringify(conversion)){
-      conversionHistory[conversion.kindName].unshift(conversion);
+    if (JSON.stringify(conversionHistory[0]) != JSON.stringify(conversion)){
+      conversionHistory.unshift(conversion);
     }
 
 
-    if (conversionHistory[conversion.kindName].length > 10)
-      conversionHistory[conversion.kindName].pop();
+    if (conversionHistory.length > 10)
+      conversionHistory.pop();
 
     localStorageService.set('conversionHistory', conversionHistory);
 
-    scope.conversionHistory = conversionHistory[conversion.kindName];
+    scope.conversionHistory = conversionHistory;
 
-    deferred.resolve(conversionHistory[conversion.kindName]);
+    deferred.resolve(conversionHistory);
 
     return deferred.promise;
 
@@ -131,18 +133,14 @@ angular.module('converter.services', ['LocalStorageModule'])
 
     /* Check if history is already set conversions in localStorage */
     if (!localStorageService.get('conversionHistory')){
-      localStorageService.set('conversionHistory', {});
+      localStorageService.set('conversionHistory', []);
     }
 
 
     /* Check if history exists for this kind of unit conversion */
     var conversionHistory = localStorageService.get('conversionHistory');
-    if (!conversionHistory.hasOwnProperty(scope.kind))
-      conversionHistory[scope.kind] = [];
 
-    localStorageService.set('conversionHistory', conversionHistory);
-
-    scope.conversionHistory = conversionHistory[scope.kind];
+    scope.conversionHistory = conversionHistory;
 
   };
 
@@ -185,7 +183,7 @@ angular.module('converter.services', ['LocalStorageModule'])
 
   factory.wipe = function(scope){
     var conversionHistory = localStorageService.get('conversionHistory');
-    conversionHistory[scope.kind] = [];
+    conversionHistory = [];
     localStorageService.set('conversionHistory', conversionHistory);
     scope.conversionHistory = [];
 
