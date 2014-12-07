@@ -15,6 +15,9 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
   $scope.firstRun = true;
   $scope.showDesc = true;
   $scope.ConversionModel = ConversionModel;
+  $scope.version = "0.2";
+
+  ConversionLocalStorageService.checkVersion($scope);
 
 
   ConversionLocalStorageService.loadHistory($scope);

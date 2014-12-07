@@ -129,6 +129,13 @@ angular.module('converter.services', ['LocalStorageModule'])
 
   };
 
+  factory.checkVersion = function(scope){
+    if (localStorageService.get('version') != scope.version){
+      localStorageService.set('version', scope.version);
+      factory.wipe(scope);
+    }
+  }
+
   factory.loadHistory = function(scope){
 
     /* Check if history is already set conversions in localStorage */
