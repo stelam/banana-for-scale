@@ -1,94 +1,105 @@
-<ion-side-menus >
+		<ion-side-menus >
       <!-- Center content -->
       <ion-side-menu-content drag-content="false" >
         <ion-pane>
           <ion-header-bar class="bar-stable app-header">
-            <h1 class="title">Banana for scale</h1>
+            <h1 class="title">Banana for scale: <a class="change-kind" ng-click="typesModal.show()">{{kind}} <i class="icon ion-edit"></i></a> </h1>
           </ion-header-bar>
 
           <ion-content>
 
-          <div class="row first">
-            <div class="col" ng-if="base.unit.name != 'feet and inches'" >
-              <div class="item item-input-inset">
 
-                <input id="base-input" type="tel" ng-model="base.value" ng-change="onBaseValueChange('')" ng-keyup="onKeyDown($event)" ng-keypress="onKeyDown($event)" ng-keydown="onKeyDown($event)" placeholder="value to convert" step="0.01" required novalidate>
+						<div class="card app-desc" ng-show="showDesc == true">
+						  <div class="item item-text-wrap">
+						  	<i ng-if="!mobile" class="icon ion-close-circled hide-app-desc" ng-click="hideAppDesc()"></i>
+            		<p>With all the existing units of measurement, misunderstandings can often arise when communicating. Introducing the banana as the universal measurement unit, all conversion-related confusion can be avoided. Use this handy app to convert imperial and metric measurements to universal bananas.</p>
 
-                <i ng-show="base.value != ''" class="icon ion-close-circled wipe-input" ng-click="wipeBaseInput('base-input')"></i>
-              </div>
-            </div>
-
-            <div class="col" ng-if="base.unit.name == 'feet and inches'" >
-              <div class="item item-input-inset">
-
-                <input id="base-input" type="tel" ng-model="base.value" ng-change="onBaseValueChange()" placeholder="feet" step="0.01" required novalidate>
-
-                <i ng-show="base.value != ''" class="icon ion-close-circled wipe-input" ng-click="wipeBaseInput('base-input')"></i>
-              </div>
-
-              <div class="item item-input-inset">
-
-                <input id="base-input-2" type="tel" ng-model="base.value2" ng-change="onBaseValueChange()" ng-keypress="onKeyDown($event)" ng-keydown="onKeyDown($event)" placeholder="inches" step="0.01" required novalidate>
-
-                <i ng-show="base.value2 != ''" class="icon ion-close-circled wipe-input" ng-click="wipeBaseInput('base-input-2')"></i>
-              </div>
-            </div>
-
-            <div class="col list unit-list">
-              <label ng-click="showModal('base')" class="item item-input item-select" ng-class="base.unit.name == 'feet and inches' ? 'big' : ''">
-                <!--<select ng-change="onBaseUnitChange()" ng-model="base.unit" ng-options="unit.name group by unit.type for unit in units"></select>-->
-                {{base.unit.name}}
-              </label>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col">
-              <button class="button-convert to button button-full button-light">
-                <i class="icon ion-arrow-down-b"></i>
-              </button>
-            </div>
-          </div>
+            		<small>*Also converts to and from other units : feet, inches, yards, miles, centimeters, millimeters, meters, kilometers, ounces, pounds, tons, grams, kilograms, etc.</small>
+						  </div>
+						</div>
 
 
-          <div class="row">
-            <div class="col" ng-if="result.value != '' && result.value2 == ''">
-              <button ng-click="resultContextualMenu(conversion)" class="button result-value icon-left ion-android-more button-light">{{result.value}}</button>
-            </div>
-            <div class="col" ng-if="result.value2 != ''">
-              <button ng-click="resultContextualMenu(conversion)" class="button result-value icon-left ion-android-more button-light">{{ConversionModel.rightSideToString(conversion)}}</button>
-            </div>
-            <div class="col list unit-list">
-              <label ng-click="showModal('result')" class="item item-input item-select">
-                {{result.unit.name}}
-              </label>
-            </div>
-          </div>
+	          <div class="row first">
+	            <div class="col" ng-if="base.unit.name != 'feet and inches'" >
+	              <div class="item item-input-inset">
 
-          <div class="padding">
-            <button ng-click="convert()" ng-disabled="base.value == ''" class="button-convert button button-full button-energized">
-              Convert
-            </button>
-          </div>
+	                <input id="base-input" type="tel" ng-model="base.value" ng-change="onBaseValueChange('')" ng-keyup="onKeyDown($event)" ng-keypress="onKeyDown($event)" ng-keydown="onKeyDown($event)" placeholder="value to convert" value="22" required novalidate>
 
-          <button ng-show="conversionHistory.length > 0" class="button button-light button-history" ng-click="toggleHistory()" ng-class="historyVisible ? 'hide-history' : ''">
-            <span ng-if="!historyVisible">Show history</span>
-            <span ng-if="historyVisible">Hide history</span>
-          </button>
-          <a ng-if="historyVisible" ng-click="deleteHistory()" class="button button-icon icon ion-ios7-trash-outline"></a>
+	                <i ng-show="base.value != ''" class="icon ion-close-circled wipe-input" ng-click="wipeBaseInput('base-input')"></i>
+	              </div>
+	            </div>
 
-          <div class="list card history"  ng-show="historyVisible == true">
-              <a href="#" class="item item-icon-left item-history" ng-click="resultContextualMenu(conversionItem)" ng-repeat="conversionItem in conversionHistory">
-                {{ConversionModel.toString(conversionItem)}}
-                <i class="icon ion-android-more"></i>
-              </a>
-          </div>
+	            <div class="col" ng-if="base.unit.name == 'feet and inches'" >
+	              <div class="item item-input-inset">
+
+	                <input id="base-input" type="tel" ng-model="base.value" ng-change="onBaseValueChange()" placeholder="feet" step="0.01" required novalidate>
+
+	                <i ng-show="base.value != ''" class="icon ion-close-circled wipe-input" ng-click="wipeBaseInput('base-input')"></i>
+	              </div>
+
+	              <div class="item item-input-inset">
+
+	                <input id="base-input-2" type="tel" ng-model="base.value2" ng-change="onBaseValueChange()" ng-keypress="onKeyDown($event)" ng-keydown="onKeyDown($event)" placeholder="inches" step="0.01" required novalidate>
+
+	                <i ng-show="base.value2 != ''" class="icon ion-close-circled wipe-input" ng-click="wipeBaseInput('base-input-2')"></i>
+	              </div>
+	            </div>
+
+	            <div class="col list unit-list">
+	              <label ng-click="showModal('base')" class="item item-input item-select" ng-class="base.unit.name == 'feet and inches' ? 'big' : ''">
+	                <!--<select ng-change="onBaseUnitChange()" ng-model="base.unit" ng-options="unit.name group by unit.type for unit in units"></select>-->
+	                {{base.unit.name}}
+	              </label>
+	            </div>
+	          </div>
+
+	          <div class="row">
+	            <div class="col">
+	              <button class="button-convert to button button-full button-light">
+	                <i class="icon ion-arrow-down-b"></i>
+	              </button>
+	            </div>
+	          </div>
+
+
+	          <div class="row">
+	            <div class="col" ng-if="result.value != '' && result.value2 == ''">
+	              <button ng-click="resultContextualMenu(conversion)" class="button result-value icon-left ion-android-more button-light">{{result.value}}</button>
+	            </div>
+	            <div class="col" ng-if="result.value2 != ''">
+	              <button ng-click="resultContextualMenu(conversion)" class="button result-value icon-left ion-android-more button-light">{{ConversionModel.rightSideToString(conversion)}}</button>
+	            </div>
+	            <div class="col list unit-list">
+	              <label ng-click="showModal('result')" class="item item-input item-select">
+	                {{result.unit.name}}
+	              </label>
+	            </div>
+	          </div>
+
+	          <div class="padding">
+	            <button ng-click="convert()" ng-disabled="base.value == ''" class="button-convert button button-full button-energized">
+	              Convert
+	            </button>
+	          </div>
+
+	          <button ng-show="conversionHistory.length > 0" class="button button-light button-history" ng-click="toggleHistory()" ng-class="historyVisible ? 'hide-history' : ''">
+	            <span ng-if="!historyVisible">Show history</span>
+	            <span ng-if="historyVisible">Hide history</span>
+	          </button>
+	          <a ng-if="historyVisible" ng-click="deleteHistory()" class="button button-icon icon ion-ios7-trash-outline"></a>
+
+	          <div class="list card history"  ng-show="historyVisible == true">
+	              <a href="#" class="item item-icon-left item-history" ng-click="resultContextualMenu(conversionItem)" ng-repeat="conversionItem in conversionHistory">
+	                {{ConversionModel.toString(conversionItem)}}
+	                <i class="icon ion-android-more"></i>
+	              </a>
+	          </div>
 
 
           </ion-content>
           <div ng-if="!mobile" class="market-links">
             <a title="Banana for scale - Android app" href="http://play.google.com/store/apps/details?id=com.bananaforscale" target="_blank">
-              <img src="img/android.png"/>
+              <img src="/img/android.png"/>
             </a>
           </div>
 

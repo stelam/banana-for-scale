@@ -1,0 +1,26 @@
+
+  <ion-modal-view>
+    <ion-header-bar class="bar-energized">
+      <h1 class="title">Conversion types: </h1>
+    </ion-header-bar>
+
+
+    <ion-content>
+		<div class="list unit-list">
+
+	
+
+		  <label ng-click="setKind(key, true)" ng-repeat="(key, value) in kinds" class="item item-radio">
+		    <input type="radio" name="unit" ng-checked="key == kind">
+		    <div class="item-content">
+		      {{key}}
+		    </div>
+		    <i class="radio-icon ion-checkmark" ng-class="key == kind ? 'visible' : '' "></i>
+		  </label>
+
+
+		</div>
+    </ion-content>
+
+
+  </ion-modal-view>

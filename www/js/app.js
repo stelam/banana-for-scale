@@ -20,13 +20,14 @@ angular.module('scale', ['ionic', 'converter', 'converter.services', 'ngRoute'])
 
 
 .config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider, ConvertCtrl){
-  //$locationProvider.html5Mode(true);
+  $locationProvider.html5Mode(false);
+  $locationProvider.hashPrefix('!'); // faudrait mettre html5 mode à true pis le foutre sur heroku en php
   $routeProvider.
-    when('/convert/:baseValue/:baseUnit/:resultUnit', {
+    when('/convert/:kind/:baseValue/:baseUnit/:resultUnit', {
       templateUrl: 'templates/converter.html',
       controller: ConvertCtrl
     }).
-    when('/convert/:baseValue/:baseValue2/:baseUnit/:resultUnit', {
+    when('/convert/:kind/:baseValue/:baseValue2/:baseUnit/:resultUnit', {
       templateUrl: 'templates/converter.html',
       controller: ConvertCtrl
     }).

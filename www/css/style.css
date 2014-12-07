@@ -3,9 +3,12 @@ input {text-align: center}
 .unit-list > label {height: 57px; padding: 0px;}
 .unit-list > label.big {height: 114px;}
 .unit-list select {position: static; direction:ltr; width: 100%; max-width:  none; padding-top: 16px; padding-right: 16px;}
-
-
+small {font-size: 0.7em; color: #777;}
+h1.title small {font-size: 8px;}
+h2.title {left: auto; right: auto;}
+a.change-kind {cursor: pointer; text-transform: capitalize; font-weight: bold;}
 .row.first {margin-top: 10px;}
+.visible {visibility: visible !important;}
 
 .button-convert.to, .button-convert.to:hover {margin: 0px auto!important; height: 51px; color:#444; background: none; border: none; min-height: 0px; height: 20px; min-width: 0px; width: 30px; color: #666; line-height: 4px;}
 .button-convert.to i {position: absolute; top: -8px; left: 8px;}
@@ -24,6 +27,13 @@ input {text-align: center}
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.hide-app-desc {
+    position: absolute;
+    right: 3px;
+    top: 1px;
+    cursor: pointer;
 }
 
 .result {
@@ -195,6 +205,7 @@ keyframes moveclouds {
 
 
 @media (max-width: 600px) {
+    .app-desc {display: none;}
   #clouds {display: none;}
   .not-mobile ion-side-menus {margin-top: 0px;}
 }

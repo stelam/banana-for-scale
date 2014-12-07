@@ -1,30 +1,32 @@
 angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 
 .controller('ConvertCtrl', function($scope, $rootScope, $route, Units, ConversionLocalStorageService, $location, $timeout, $ionicActionSheet, $cordovaSplashscreen, $ionicPopup, ConnectionManager, $ionicScrollDelegate, $cordovaDialogs, $cordovaToast, ConversionModel, $ionicSideMenuDelegate, $ionicModal, $ionicPlatform) {
-  $scope.units = Units.all();
+  
   $scope.result = {value: "", value2 : ""};
   $scope.base = {value : "", value2 : "", lastValue : 0};
   $scope.kind = "length"; // hardcoded for now
+  $scope.units = Units.allByType('length');
+  $scope.kinds = Units.all();
   $scope.conversionHistory = [];
   $scope.conversion = {}
   $scope.historyVisible = false;
   $scope.search = {value : ""};
   $scope.mobile = true;
+  $scope.firstRun = true;
+  $scope.showDesc = true;
   $scope.ConversionModel = ConversionModel;
 
 
   ConversionLocalStorageService.loadHistory($scope);
 
   ConversionLocalStorageService.loadLastUsedUnits($scope).then(function(){}, function(error){
-    Units.getByName("inches").then(function(unit){
-      $scope.base.unit = unit;
+    Units.getDefaults($scope.kind).then(function(defaultUnits){
+      $scope.base.unit = defaultUnits[0];
+      $scope.result.unit = defaultUnits[1]; 
     });
-
-    Units.getByName("bananas").then(function(unit){
-      $scope.result.unit = unit;
-    });
-
   })
+
+
 
 
   $timeout(function(){
@@ -39,7 +41,8 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 	  	
 	  	try {
 	  		var baseQty = ConversionModel.getBaseQty($scope);
-	  		$scope.result.value = baseQty.to($scope.result.unit.name).scalar;
+	  		$scope.result.value = baseQty.to($scope.result.unit.id).scalar;
+
 
 		  	ConversionModel.setResult($scope);
 
@@ -48,9 +51,9 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 		  		$scope.conversion = conversionHistory[0];
 
           if ($scope.base.value2 > 0)
-            var url = "convert/" +  $scope.base.value + "_" + $scope.base.value2 + "/" + $scope.base.unit.name + "/" + $scope.result.unit.name;
+            var url = "convert/" + $scope.kind + "/" +  $scope.base.value + "_" + $scope.base.value2 + "/" + $scope.base.unit.name + "/" + $scope.result.unit.name;
           else
-            var url = "convert/" +  $scope.base.value + "/" + $scope.base.unit.name + "/" + $scope.result.unit.name;
+            var url = "convert/" + $scope.kind + "/" +  $scope.base.value + "/" + $scope.base.unit.name + "/" + $scope.result.unit.name;
 
           url = url.replace(/\s+/g, '-').toLowerCase();
           $location.path(url);
@@ -73,26 +76,33 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 
 
   $scope.$on('$routeChangeSuccess', function (ev, current, prev) {
-
     try {
       var baseValues = $route.current.params.baseValue.split("_");
 
       $scope.base.value = baseValues[0];
       $scope.base.value2 = (baseValues.length > 1) ? baseValues[1] : 0;
+      
+      $scope.setKind($route.current.params.kind);
 
-      Units.getByName($route.current.params.baseUnit.replace(/-/g, ' ')).then(function(unit){
+      Units.getByName($route.current.params.baseUnit.replace(/-/g, ' '), $scope.kind).then(function(unit){
         $scope.base.unit = unit;
 
-        Units.getByName($route.current.params.resultUnit.replace(/-/g, ' ')).then(function(unit2){
+        Units.getByName($route.current.params.resultUnit.replace(/-/g, ' '), $scope.kind).then(function(unit2){
           $scope.result.unit = unit2;
-          $timeout(function(){
-            $scope.convert();
-          }, 500);
+          if ($scope.firstRun){
+            $scope.firstRun = false;
+            $timeout(function(){
+              if ($scope.base.value2 == null) $scope.base.value2 = 0;
+              $scope.convert();
+            }, 500);
+          }
         });
       });
 
     } catch (exception) {
-      console.log("bad params");
+      ConversionLocalStorageService.loadLastUsedKind($scope).then(function(){
+        $scope.setKind($scope.kind);
+      });
     }
 
 
@@ -112,6 +122,13 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
       animation: 'slide-in-up'
     }).then(function(modal) {
       $scope.modal = modal;
+    });
+
+    $ionicModal.fromTemplateUrl('modal-types.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.typesModal = modal;
     });
 
 
@@ -145,7 +162,10 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
     $scope.currentUnit.side = side;
     $scope.search.value = "";
     $scope.modal.show();
+  }
 
+  $scope.hideAppDesc = function(){
+    $scope.showDesc = false;
   }
 
   $scope.scrollTop = function() {
@@ -161,21 +181,49 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
       //$scope.modal.remove();
     });
 
-    Units.getByName(name).then(function(unit){
+    Units.getByName(name, $scope.kind).then(function(unit){
       if ($scope.currentUnit.side == 'base'){
         $scope.base.unit = unit;
         $scope.onBaseUnitChange();
-        ConversionLocalStorageService.saveLastUsedBaseUnit($scope);
+        
       }else{
         $scope.result.unit = unit;
-        ConversionLocalStorageService.saveLastUsedResultUnit($scope);
 
         $timeout(function(){
           $scope.convert();
         }, 400)
         
       }
+      ConversionLocalStorageService.saveLastUsedBaseUnit($scope);
+      ConversionLocalStorageService.saveLastUsedResultUnit($scope);
     });
+  }
+
+  $scope.setKind = function(name, wipe){
+    try{
+      $scope.typesModal.hide();
+    } catch (exception){}
+
+    $scope.units = Units.allByType(name);
+    $scope.kind = name;
+    ConversionLocalStorageService.loadHistory($scope);
+
+    if (wipe){
+      $scope.wipeBaseInput("base-input")
+      $scope.wipeBaseInput("base-input-2")
+      $location.path("")
+    }
+
+    ConversionLocalStorageService.saveLastUsedKind($scope);
+
+    ConversionLocalStorageService.loadLastUsedUnits($scope).then(function(){}, function(error){
+      Units.getDefaults($scope.kind).then(function(defaultUnits){
+        $scope.base.unit = defaultUnits[0];
+        $scope.result.unit = defaultUnits[1]; 
+      });
+
+    })
+
   }
 
 
@@ -338,7 +386,6 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
   }
 
   $scope.onKeyDown = function(event){
-  	console.log(event.keyCode);
   	if (event.keyCode === 13 || event.keyCode === 9){
   		$scope.convert();
   	} 
@@ -354,7 +401,11 @@ angular.module('converter', ['ionic', 'ngCordova', 'angular.filter'])
 	  	$scope.base.lastValue2 = "";
 	}
   	$timeout(function(){
-  		document.getElementById(eleId).focus();
+      try {
+  		  document.getElementById(eleId).focus();
+      } catch(exception){
+
+      }
   	}, 50)
   	
   }
