@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banana for Scale - Universal Unit Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light theme - warm paper aesthetic */
+      --bg-primary: #F5F0E8;
+      --bg-secondary: #EDE6DB;
+      --bg-card: #FDFBF7;
+      --text-primary: #1A1714;
+      --text-secondary: #4A453D;
+      --text-muted: #8A847A;
+      --accent-primary: #D4A84B;
+      --accent-hover: #C49A3D;
+      --border-color: rgba(26, 23, 20, 0.08);
+      --border-strong: rgba(26, 23, 20, 0.15);
+      --shadow-sm: 0 1px 3px rgba(26, 23, 20, 0.04);
+      --shadow-md: 0 4px 12px rgba(26, 23, 20, 0.06);
+      --shadow-lg: 0 12px 40px rgba(26, 23, 20, 0.08);
+      --input-bg: #FFFFFF;
+      --banana-opacity: 0.04;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #1A1714;
+      --bg-secondary: #242019;
+      --bg-card: #2A2520;
+      --text-primary: #F5F0E8;
+      --text-secondary: #C4BEB4;
+      --text-muted: #7A756B;
+      --accent-primary: #E8B84B;
+      --accent-hover: #F5C85C;
+      --border-color: rgba(245, 240, 232, 0.06);
+      --border-strong: rgba(245, 240, 232, 0.12);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+      --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.3);
+      --input-bg: #1A1714;
+      --banana-opacity: 0.03;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    /* Background Banana Pattern */
+    .bg-banana {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 140vmax;
+      height: 140vmax;
+      pointer-events: none;
+      z-index: 0;
+      opacity: var(--banana-opacity);
+      transition: opacity 0.5s ease;
+    }
+
+    .bg-banana svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      opacity: 0.15;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(10px, -20px) rotate(90deg); }
+      50% { transform: translate(-5px, -40px) rotate(180deg); }
+      75% { transform: translate(15px, -20px) rotate(270deg); }
+    }
+
+    /* Layout */
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2rem;
+    }
+
+    .logo {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 1.375rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .logo span {
+      color: var(--text-muted);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 0.875rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+
+    .theme-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      margin-left: 0.5rem;
+    }
+
+    .theme-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--border-strong);
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    /* Left Side - Branding */
+    .branding {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .brand-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .brand-title span {
+      color: var(--text-muted);
+    }
+
+    .brand-desc {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      max-width: 380px;
+    }
+
+    .banana-illustration {
+      width: 100%;
+      max-width: 420px;
+      margin-top: 1rem;
+      filter: drop-shadow(0 20px 40px rgba(180, 140, 60, 0.15));
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .banana-illustration:hover {
+      transform: rotate(-3deg) scale(1.02);
+    }
+
+    /* Right Side - Converter */
+    .converter {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .converter:hover {
+      box-shadow: var(--shadow-lg), 0 0 0 1px var(--border-strong);
+    }
+
+    /* Type Tabs */
+    .type-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .type-tab {
+      flex: 1;
+      padding: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .type-tab:hover {
+      color: var(--text-secondary);
+    }
+
+    .type-tab.active {
+      color: var(--text-primary);
+    }
+
+    .type-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 1rem;
+      right: 1rem;
+      height: 2px;
+      background: var(--accent-primary);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Converter Body */
+    .converter-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Input Group */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.15);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Compound input for feet & inches */
+    .compound-input {
+      display: none;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .compound-input.visible {
+      display: flex;
+    }
+
+    .compound-field {
+      flex: 1;
+      position: relative;
+    }
+
+    .compound-field .input-field {
+      padding-right: 2.5rem;
+    }
+
+    .compound-suffix {
+      position: absolute;
+      right: 0.875rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Unit Select */
+    .unit-select-wrapper {
+      position: relative;
+      min-width: 130px;
+    }
+
+    .unit-select {
+      width: 100%;
+      height: 100%;
+      padding: 0.875rem 2.25rem 0.875rem 0.875rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      transition: all 0.2s ease;
+    }
+
+    .unit-select:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .unit-select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 0.875rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Swap */
+    .swap-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 0;
+    }
+
+    .swap-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .swap-btn:hover {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: white;
+      transform: rotate(180deg);
+    }
+
+    /* Result */
+    .result-group {
+      background: var(--bg-secondary);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .result-group:hover {
+      background: var(--bg-primary);
+    }
+
+    .result-banana {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    .result-banana svg {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s ease;
+    }
+
+    .result-group:hover .result-banana svg {
+      transform: rotate(-8deg) scale(1.1);
+    }
+
+    .result-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .result-value {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1.2;
+      display: flex;
+      align-items: baseline;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+    }
+
+    .result-value .unit {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .result-target {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      margin-top: 0.375rem;
+    }
+
+    .result-target-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .result-target .unit-select {
+      padding: 0.375rem 1.75rem 0.375rem 0.625rem;
+      font-size: 0.8125rem;
+      background: var(--input-bg);
+      min-width: 100px;
+    }
+
+    .result-target .unit-select-wrapper::after {
+      right: 0.625rem;
+    }
+
+    .result-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .copy-toast {
+      font-size: 0.6875rem;
+      color: var(--accent-primary);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      margin-top: 0.25rem;
+    }
+
+    .copy-toast.show {
+      opacity: 1;
+    }
+
+    /* Quick presets */
+    .presets {
+      display: flex;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+      padding-top: 0.5rem;
+    }
+
+    .preset-btn {
+      padding: 0.4375rem 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .preset-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent-primary);
+      background: rgba(212, 168, 75, 0.08);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 480px;
+      }
+
+      .branding {
+        text-align: center;
+        align-items: center;
+      }
+
+      .brand-desc {
+        max-width: 100%;
+      }
+
+      .banana-illustration {
+        max-width: 280px;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .header {
+        padding: 1rem 1.25rem;
+      }
+
+      .nav-link {
+        display: none;
+      }
+
+      .main {
+        padding: 1rem;
+      }
+
+      .brand-title {
+        font-size: 2.5rem;
+      }
+
+      .converter-body {
+        padding: 1.25rem;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .unit-select-wrapper {
+        min-width: 100%;
+      }
+
+      .result-value {
+        font-size: 1.625rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pop {
+      animation: pop 0.25s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Banana -->
+  <div class="bg-banana">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M140 40C165 55 175 95 160 135C145 175 100 185 55 170C30 162 15 140 25 105C35 70 65 45 105 35C125 30 135 32 140 40Z" fill="currentColor"/>
+    </svg>
+  </div>
+
+  <!-- Particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">Banana <span>for</span> Scale</div>
+      <nav class="nav">
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link">History</a>
+        <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">☀️</button>
+      </nav>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="container">
+        <!-- Left: Branding -->
+        <div class="branding">
+          <h1 class="brand-title">Banana<br><span>for</span> Scale</h1>
+          <p class="brand-desc">Experience measurement redefined. When inches fail and centimeters confuse, trust the universal truth: the golden banana becomes the gold standard.</p>
+
+          <!-- Illustrated Banana SVG -->
+          <svg class="banana-illustration" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shadow -->
+            <ellipse cx="200" cy="185" rx="140" ry="12" fill="#1A1714" opacity="0.06"/>
+
+            <!-- Banana body - main shape -->
+            <path d="M45 140C30 115 35 75 70 50C105 25 160 15 220 20C280 25 340 50 365 85C390 120 380 150 345 160C310 170 250 165 190 155C130 145 80 150 55 145C45 143 40 142 45 140Z" fill="url(#bananaGradient)"/>
+
+            <!-- Inner curve highlight -->
+            <path d="M60 130C50 110 55 80 85 60C115 40 165 32 220 36C275 40 325 60 348 88" stroke="url(#highlightGradient)" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.4"/>
+
+            <!-- Top edge highlight -->
+            <path d="M80 55C110 35 160 25 215 28C270 31 320 48 350 75" stroke="#FFF8E7" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+
+            <!-- Subtle ridges -->
+            <path d="M100 130C95 110 105 85 130 70" stroke="#D4A020" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+            <path d="M150 145C145 125 150 100 170 82" stroke="#D4A020" stroke-width="1.5" stroke-linecap="round" opacity="0.15"/>
+            <path d="M210 152C208 132 215 105 235 88" stroke="#D4A020" stroke-width="1.5" stroke-linecap="round" opacity="0.12"/>
+            <path d="M270 155C272 135 280 112 300 98" stroke="#D4A020" stroke-width="1.5" stroke-linecap="round" opacity="0.1"/>
+
+            <!-- Stem end -->
+            <ellipse cx="52" cy="142" rx="12" ry="8" fill="#8B7355" transform="rotate(-25 52 142)"/>
+            <ellipse cx="50" cy="140" rx="8" ry="5" fill="#6B5344" transform="rotate(-25 50 140)"/>
+
+            <!-- Tip end -->
+            <path d="M355 155C365 152 372 145 368 138C364 131 355 130 348 135" fill="#5C4A32"/>
+            <ellipse cx="358" cy="148" rx="6" ry="4" fill="#4A3C28" transform="rotate(15 358 148)"/>
+
+            <!-- Brown spots for character -->
+            <circle cx="120" cy="100" r="4" fill="#B8860B" opacity="0.15"/>
+            <circle cx="180" cy="85" r="3" fill="#B8860B" opacity="0.12"/>
+            <circle cx="250" cy="95" r="5" fill="#B8860B" opacity="0.1"/>
+            <circle cx="300" cy="110" r="3" fill="#B8860B" opacity="0.08"/>
+            <circle cx="145" cy="120" r="2" fill="#B8860B" opacity="0.1"/>
+            <circle cx="220" cy="130" r="2.5" fill="#B8860B" opacity="0.08"/>
+
+            <!-- Gradients -->
+            <defs>
+              <linearGradient id="bananaGradient" x1="50" y1="100" x2="380" y2="100" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#E8C547"/>
+                <stop offset="20%" stop-color="#F5D54A"/>
+                <stop offset="50%" stop-color="#FFE55C"/>
+                <stop offset="80%" stop-color="#F5D54A"/>
+                <stop offset="100%" stop-color="#D4B040"/>
+              </linearGradient>
+              <linearGradient id="highlightGradient" x1="60" y1="80" x2="350" y2="80" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFF8DC"/>
+                <stop offset="50%" stop-color="#FFFACD"/>
+                <stop offset="100%" stop-color="#FFF8DC"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Right: Converter -->
+        <div class="converter">
+          <!-- Type tabs -->
+          <div class="type-tabs">
+            <button class="type-tab active" data-type="length">Length</button>
+            <button class="type-tab" data-type="weight">Weight</button>
+          </div>
+
+          <!-- Body -->
+          <div class="converter-body">
+            <!-- From -->
+            <div class="input-group">
+              <label class="input-label">Convert</label>
+              <div class="input-row">
+                <div class="input-wrapper" id="standardInput">
+                  <input type="number" class="input-field" id="valueInput" placeholder="0" value="5.92">
+                </div>
+                <div class="compound-input" id="compoundInput">
+                  <div class="compound-field">
+                    <input type="number" class="input-field" id="feetInput" placeholder="0" value="5">
+                    <span class="compound-suffix">ft</span>
+                  </div>
+                  <div class="compound-field">
+                    <input type="number" class="input-field" id="inchesInput" placeholder="0" value="11">
+                    <span class="compound-suffix">in</span>
+                  </div>
+                </div>
+                <div class="unit-select-wrapper">
+                  <select class="unit-select" id="fromUnit"></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Swap -->
+            <div class="swap-row">
+              <button class="swap-btn" id="swapBtn" aria-label="Swap units">⇅</button>
+            </div>
+
+            <!-- Result -->
+            <div class="result-group" id="resultGroup">
+              <div class="result-banana">
+                <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M45 18C52 24 55 36 48 48C41 60 27 62 14 56C8 53 4 46 8 36C12 26 22 20 35 17C42 15 44 15 45 18Z" fill="url(#miniBanana)"/>
+                  <ellipse cx="12" cy="54" rx="4" ry="3" fill="#6B5344" transform="rotate(-30 12 54)"/>
+                  <circle cx="32" cy="35" r="2" fill="#B8860B" opacity="0.15"/>
+                  <circle cx="38" cy="28" r="1.5" fill="#B8860B" opacity="0.12"/>
+                  <defs>
+                    <linearGradient id="miniBanana" x1="10" y1="40" x2="55" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#E8C547"/>
+                      <stop offset="50%" stop-color="#FFE55C"/>
+                      <stop offset="100%" stop-color="#D4B040"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="result-content">
+                <div class="result-value">
+                  <span id="resultNum">10.2</span>
+                  <span class="unit" id="resultUnit">bananas</span>
+                </div>
+                <div class="result-target">
+                  <span class="result-target-label">to</span>
+                  <div class="unit-select-wrapper">
+                    <select class="unit-select" id="toUnit"></select>
+                  </div>
+                </div>
+                <div class="result-meta" id="resultMeta">5 ft 11 in ≈ 180 cm</div>
+                <div class="copy-toast" id="copyToast">Copied!</div>
+              </div>
+            </div>
+
+            <!-- Presets -->
+            <div class="presets">
+              <button class="preset-btn" data-val="1.8" data-unit="m">Human height</button>
+              <button class="preset-btn" data-val="443" data-unit="m">Empire State</button>
+              <button class="preset-btn" data-val="42.195" data-unit="km">Marathon</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer-text">1 banana ≈ 17.78 cm · Made with 🍌</p>
+    </footer>
+  </div>
+
+  <script>
+    // Constants
+    const BANANA_CM = 17.78;
+    const BANANA_G = 118;
+
+    const LENGTH_CM = {
+      bananas: BANANA_CM, inches: 2.54, feet: 30.48, 'feet-inches': 30.48,
+      yards: 91.44, miles: 160934.4, mm: 0.1, cm: 1, m: 100, km: 100000
+    };
+
+    const WEIGHT_G = {
+      bananas: BANANA_G, oz: 28.3495, lb: 453.592, tons: 907185,
+      g: 1, kg: 1000, 'metric-tons': 1000000
+    };
+
+    const LABELS = {
+      bananas: 'bananas', inches: 'in', feet: 'ft', 'feet-inches': 'ft & in',
+      yards: 'yd', miles: 'mi', mm: 'mm', cm: 'cm', m: 'm', km: 'km',
+      oz: 'oz', lb: 'lb', tons: 'tons', g: 'g', kg: 'kg', 'metric-tons': 't'
+    };
+
+    // State
+    let convType = 'length';
+    let dark = localStorage.getItem('theme') === 'dark';
+
+    // Elements
+    const themeBtn = document.getElementById('themeBtn');
+    const tabs = document.querySelectorAll('.type-tab');
+    const fromUnit = document.getElementById('fromUnit');
+    const toUnit = document.getElementById('toUnit');
+    const valueInput = document.getElementById('valueInput');
+    const feetInput = document.getElementById('feetInput');
+    const inchesInput = document.getElementById('inchesInput');
+    const standardInput = document.getElementById('standardInput');
+    const compoundInput = document.getElementById('compoundInput');
+    const resultNum = document.getElementById('resultNum');
+    const resultUnit = document.getElementById('resultUnit');
+    const resultMeta = document.getElementById('resultMeta');
+    const resultGroup = document.getElementById('resultGroup');
+    const copyToast = document.getElementById('copyToast');
+    const swapBtn = document.getElementById('swapBtn');
+    const presets = document.querySelectorAll('.preset-btn');
+
+    // Theme
+    function setTheme(isDark) {
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      themeBtn.textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+    setTheme(dark);
+
+    themeBtn.addEventListener('click', () => {
+      dark = !dark;
+      setTheme(dark);
+    });
+
+    // Tabs
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        convType = tab.dataset.type;
+        populateUnits();
+        convert();
+      });
+    });
+
+    // Populate units
+    function populateUnits() {
+      const lengthOpts = `
+        <option value="bananas">🍌 Bananas</option>
+        <option value="feet-inches">Feet & Inches</option>
+        <option value="inches">Inches</option>
+        <option value="feet">Feet</option>
+        <option value="yards">Yards</option>
+        <option value="miles">Miles</option>
+        <option value="mm">Millimeters</option>
+        <option value="cm">Centimeters</option>
+        <option value="m">Meters</option>
+        <option value="km">Kilometers</option>
+      `;
+      const lengthToOpts = lengthOpts.replace('<option value="feet-inches">Feet & Inches</option>', '');
+
+      const weightOpts = `
+        <option value="bananas">🍌 Bananas</option>
+        <option value="oz">Ounces</option>
+        <option value="lb">Pounds</option>
+        <option value="tons">Short Tons</option>
+        <option value="g">Grams</option>
+        <option value="kg">Kilograms</option>
+        <option value="metric-tons">Metric Tons</option>
+      `;
+
+      if (convType === 'length') {
+        fromUnit.innerHTML = lengthOpts;
+        toUnit.innerHTML = lengthToOpts;
+        fromUnit.value = 'feet-inches';
+        toUnit.value = 'bananas';
+      } else {
+        fromUnit.innerHTML = weightOpts;
+        toUnit.innerHTML = weightOpts;
+        fromUnit.value = 'kg';
+        toUnit.value = 'bananas';
+      }
+      handleFromChange();
+    }
+
+    // Handle from unit change
+    function handleFromChange() {
+      if (fromUnit.value === 'feet-inches') {
+        standardInput.style.display = 'none';
+        compoundInput.classList.add('visible');
+      } else {
+        standardInput.style.display = 'block';
+        compoundInput.classList.remove('visible');
+      }
+      convert();
+    }
+
+    fromUnit.addEventListener('change', handleFromChange);
+    toUnit.addEventListener('change', convert);
+
+    // Conversion
+    function convert() {
+      const from = fromUnit.value;
+      const to = toUnit.value;
+      let val;
+
+      if (from === 'feet-inches') {
+        const ft = parseFloat(feetInput.value) || 0;
+        const inc = parseFloat(inchesInput.value) || 0;
+        val = ft + inc / 12;
+      } else {
+        val = parseFloat(valueInput.value) || 0;
+      }
+
+      let result, meta;
+      if (convType === 'length') {
+        const fromFactor = from === 'feet-inches' ? LENGTH_CM.feet : LENGTH_CM[from];
+        const cm = val * fromFactor;
+        result = cm / LENGTH_CM[to];
+        if (from === 'feet-inches') {
+          const ft = parseInt(feetInput.value) || 0;
+          const inc = parseFloat(inchesInput.value) || 0;
+          meta = `${ft} ft ${inc} in ≈ ${Math.round(cm)} cm`;
+        } else {
+          meta = `${val} ${LABELS[from]} ≈ ${Math.round(cm)} cm`;
+        }
+      } else {
+        const g = val * WEIGHT_G[from];
+        result = g / WEIGHT_G[to];
+        meta = `${val} ${LABELS[from]} ≈ ${Math.round(g)} g`;
+      }
+
+      // Format
+      let formatted;
+      if (result >= 1e6) formatted = (result / 1e6).toFixed(2) + 'M';
+      else if (result >= 1e3) formatted = (result / 1e3).toFixed(2) + 'K';
+      else if (result < 0.01 && result > 0) formatted = result.toExponential(2);
+      else formatted = result.toFixed(2);
+
+      resultNum.textContent = formatted;
+      resultNum.classList.add('pop');
+      setTimeout(() => resultNum.classList.remove('pop'), 250);
+
+      resultUnit.textContent = LABELS[to];
+      resultMeta.textContent = meta;
+    }
+
+    // Inputs
+    valueInput.addEventListener('input', convert);
+    feetInput.addEventListener('input', convert);
+    inchesInput.addEventListener('input', convert);
+
+    // Tab between feet/inches
+    feetInput.addEventListener('keydown', e => {
+      if (e.key === 'Tab' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        inchesInput.focus();
+        inchesInput.select();
+      }
+    });
+
+    inchesInput.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        feetInput.focus();
+        feetInput.select();
+      }
+    });
+
+    // Swap
+    swapBtn.addEventListener('click', () => {
+      if (fromUnit.value === 'feet-inches') return;
+      const f = fromUnit.value, t = toUnit.value;
+      const fOpts = [...fromUnit.options].map(o => o.value);
+      const tOpts = [...toUnit.options].map(o => o.value);
+      if (fOpts.includes(t) && tOpts.includes(f)) {
+        fromUnit.value = t;
+        toUnit.value = f;
+        handleFromChange();
+      }
+    });
+
+    // Copy
+    resultGroup.addEventListener('click', async () => {
+      const text = `${resultNum.textContent} ${resultUnit.textContent}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyToast.classList.add('show');
+        setTimeout(() => copyToast.classList.remove('show'), 1500);
+      } catch (e) {}
+    });
+
+    // Presets
+    presets.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.val;
+        const unit = btn.dataset.unit;
+        convType = 'length';
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelector('[data-type="length"]').classList.add('active');
+        populateUnits();
+        fromUnit.value = unit;
+        handleFromChange();
+        valueInput.value = val;
+        toUnit.value = 'bananas';
+        convert();
+      });
+    });
+
+    // Particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      container.innerHTML = '';
+      const count = Math.min(Math.floor(window.innerWidth / 40), 30);
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.top = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 20 + 's';
+        p.style.animationDuration = (15 + Math.random() * 10) + 's';
+        p.style.width = (2 + Math.random() * 3) + 'px';
+        p.style.height = p.style.width;
+        container.appendChild(p);
+      }
+    }
+
+    createParticles();
+    window.addEventListener('resize', createParticles);
+
+    // Init
+    populateUnits();
+  </script>
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banana for Scale - Unit Converter</title>
+  <meta name="description" content="Convert measurements to bananas. The fun and intuitive way to understand sizes.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Banana for Scale",
+    "description": "Universal unit converter using bananas"
+  }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /*
+      LAYOUT 9: FULL WIDTH HORIZONTAL
+      - Horizontal flow across entire viewport
+      - Input | Result | Info panels side by side
+      - Bottom bar for ads
+      - Great for wide screens
+    */
+    :root {
+      --bg: #FAFAFA;
+      --card: #FFFFFF;
+      --card-alt: #F5F5F5;
+      --text: #171717;
+      --text-secondary: #525252;
+      --text-muted: #A3A3A3;
+      --border: #E5E5E5;
+      --accent: #F59E0B;
+      --accent-light: #FEF3C7;
+      --ad-bg: #E5E5E5;
+    }
+    [data-theme="dark"] {
+      --bg: #0A0A0A;
+      --card: #171717;
+      --card-alt: #262626;
+      --text: #FAFAFA;
+      --text-secondary: #D4D4D4;
+      --text-muted: #737373;
+      --border: #262626;
+      --accent: #FBBF24;
+      --accent-light: #422006;
+      --ad-bg: #262626;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+      height: 64px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .logo { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .logo span { color: var(--text-muted); font-weight: 400; }
+    .header-center {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .type-btn {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .type-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .header-ad {
+      background: var(--ad-bg);
+      border: 1px dashed var(--border);
+      padding: 0.25rem 1rem;
+      border-radius: 4px;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    .theme-btn {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 1.125rem;
+    }
+    /* Main Layout */
+    .main-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      min-height: 0;
+    }
+    /* Panels */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .panel-input { background: var(--card); border-right: 1px solid var(--border); }
+    .panel-result { background: var(--accent); }
+    .panel-info { background: var(--card-alt); border-left: 1px solid var(--border); }
+    .panel-header {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .panel-result .panel-header { color: rgba(0,0,0,0.4); }
+    /* Input Panel */
+    .input-group { margin-bottom: 1.5rem; }
+    .input-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .value-field {
+      width: 100%;
+      padding: 1rem;
+      font-family: inherit;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+    }
+    .value-field:focus { border-color: var(--accent); }
+    .value-field::placeholder { color: var(--text-muted); }
+    /* Compound */
+    .compound-fields { display: none; gap: 0.75rem; }
+    .compound-fields.visible { display: flex; }
+    .compound-field { flex: 1; position: relative; }
+    .compound-field input {
+      width: 100%;
+      padding: 1rem 2.5rem 1rem 1rem;
+      font-family: inherit;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+    }
+    .compound-field input:focus { border-color: var(--accent); }
+    .compound-field .suffix {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .unit-select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .swap-btn {
+      width: 100%;
+      padding: 1rem;
+      margin-top: auto;
+      border: 2px solid var(--border);
+      background: var(--card);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .swap-btn:hover { border-color: var(--accent); color: var(--accent); }
+    /* Result Panel */
+    .result-display {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .result-value {
+      font-size: 4rem;
+      font-weight: 700;
+      color: #000;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .result-unit {
+      font-size: 1.5rem;
+      color: rgba(0,0,0,0.6);
+      margin-bottom: 2rem;
+    }
+    .result-select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.3);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      color: #000;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    .copy-btn {
+      padding: 1rem;
+      background: rgba(0,0,0,0.15);
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color: rgba(0,0,0,0.8);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(0,0,0,0.25); }
+    /* Info Panel */
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .info-card h3 {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .info-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .info-ad {
+      background: var(--ad-bg);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+    /* Bottom Ad Bar */
+    .bottom-ad-bar {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex-shrink: 0;
+    }
+    .bottom-ad {
+      background: var(--ad-bg);
+      border: 1px dashed var(--border);
+      padding: 0.5rem 3rem;
+      border-radius: 4px;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .main-layout { grid-template-columns: 1fr 1fr; }
+      .panel-info { display: none; }
+    }
+    @media (max-width: 768px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .panel-result { order: -1; padding: 1.5rem; }
+      .result-value { font-size: 2.5rem; }
+      .result-unit { font-size: 1rem; margin-bottom: 1rem; }
+      .header-center { display: none; }
+      .header-ad { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🍌 Banana <span>for</span> Scale</div>
+    <div class="header-center">
+      <button class="type-btn active" data-type="length">📏 Length</button>
+      <button class="type-btn" data-type="weight">⚖️ Weight</button>
+    </div>
+    <div class="header-right">
+      <div class="header-ad">Ad: 234x60</div>
+      <button class="theme-btn" id="themeBtn">☀️</button>
+    </div>
+  </header>
+
+  <main class="main-layout">
+    <!-- Input Panel -->
+    <section class="panel panel-input">
+      <div class="panel-header">Input</div>
+
+      <div class="input-group">
+        <label class="input-label">Value</label>
+        <input type="number" class="value-field" id="valueInput" placeholder="Enter value" value="5.92">
+        <div class="compound-fields" id="compoundFields">
+          <div class="compound-field">
+            <input type="number" id="feetInput" value="5">
+            <span class="suffix">ft</span>
+          </div>
+          <div class="compound-field">
+            <input type="number" id="inchesInput" value="11">
+            <span class="suffix">in</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Unit</label>
+        <select class="unit-select" id="fromUnit"></select>
+      </div>
+
+      <button class="swap-btn" id="swapBtn">⇄ Swap Units</button>
+    </section>
+
+    <!-- Result Panel -->
+    <section class="panel panel-result">
+      <div class="panel-header">Result</div>
+      <div class="result-display">
+        <div class="result-value" id="resultValue">10.14</div>
+        <div class="result-unit" id="resultUnit">bananas</div>
+        <select class="result-select" id="toUnit"></select>
+        <button class="copy-btn" id="copyBtn">📋 Copy Result</button>
+      </div>
+    </section>
+
+    <!-- Info Panel -->
+    <aside class="panel panel-info">
+      <div class="panel-header">Info</div>
+
+      <article class="info-card">
+        <h3>About This Conversion</h3>
+        <p>5 feet 11 inches equals approximately 10.14 average bananas. We use 17.78 cm (7") as the standard banana length.</p>
+      </article>
+
+      <article class="info-card">
+        <h3>Did You Know?</h3>
+        <p>The average person is about 9-10 bananas tall. Professional basketball players can be up to 12+ bananas!</p>
+      </article>
+
+      <article class="info-card">
+        <h3>Banana Facts</h3>
+        <p>Bananas are the most popular fruit worldwide. Over 100 billion bananas are consumed annually.</p>
+      </article>
+
+      <div class="info-ad">Ad Space<br>300x250</div>
+    </aside>
+  </main>
+
+  <div class="bottom-ad-bar">
+    <div class="bottom-ad">Ad Space: 728x90 Leaderboard</div>
+  </div>
+
+  <script>
+    const BANANA_CM = 17.78, BANANA_G = 118;
+    const LENGTH_CM = { bananas: BANANA_CM, inches: 2.54, feet: 30.48, 'feet-inches': 30.48, yards: 91.44, miles: 160934.4, mm: 0.1, cm: 1, m: 100, km: 100000 };
+    const WEIGHT_G = { bananas: BANANA_G, oz: 28.3495, lb: 453.592, tons: 907185, g: 1, kg: 1000, 'metric-tons': 1000000 };
+    const LABELS = { bananas: 'bananas', inches: 'inches', feet: 'feet', 'feet-inches': 'feet & inches', yards: 'yards', miles: 'miles', mm: 'mm', cm: 'cm', m: 'meters', km: 'km', oz: 'ounces', lb: 'pounds', tons: 'tons', g: 'grams', kg: 'kg', 'metric-tons': 'metric tons' };
+
+    let convType = 'length', dark = localStorage.getItem('theme') === 'dark';
+    const $ = id => document.getElementById(id);
+
+    function setTheme(d) {
+      document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      $('themeBtn').textContent = d ? '🌙' : '☀️';
+      localStorage.setItem('theme', d ? 'dark' : 'light');
+    }
+    setTheme(dark);
+    $('themeBtn').onclick = () => { dark = !dark; setTheme(dark); };
+
+    document.querySelectorAll('.type-btn').forEach(btn => btn.onclick = () => {
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      convType = btn.dataset.type;
+      populateUnits();
+    });
+
+    function populateUnits() {
+      const lengthOpts = '<option value="feet-inches">Feet & Inches</option><option value="bananas">Bananas</option><option value="inches">Inches</option><option value="feet">Feet</option><option value="yards">Yards</option><option value="miles">Miles</option><option value="mm">Millimeters</option><option value="cm">Centimeters</option><option value="m">Meters</option><option value="km">Kilometers</option>';
+      const lengthToOpts = '<option value="bananas">Bananas</option><option value="inches">Inches</option><option value="feet">Feet</option><option value="yards">Yards</option><option value="miles">Miles</option><option value="mm">Millimeters</option><option value="cm">Centimeters</option><option value="m">Meters</option><option value="km">Kilometers</option>';
+      const weightOpts = '<option value="kg">Kilograms</option><option value="bananas">Bananas</option><option value="oz">Ounces</option><option value="lb">Pounds</option><option value="tons">Tons</option><option value="g">Grams</option><option value="metric-tons">Metric Tons</option>';
+      const weightToOpts = '<option value="bananas">Bananas</option><option value="g">Grams</option><option value="kg">Kilograms</option><option value="oz">Ounces</option><option value="lb">Pounds</option><option value="tons">Tons</option><option value="metric-tons">Metric Tons</option>';
+      if (convType === 'length') {
+        $('fromUnit').innerHTML = lengthOpts;
+        $('toUnit').innerHTML = lengthToOpts;
+      } else {
+        $('fromUnit').innerHTML = weightOpts;
+        $('toUnit').innerHTML = weightToOpts;
+      }
+      handleFromChange();
+    }
+
+    function handleFromChange() {
+      const isCompound = $('fromUnit').value === 'feet-inches';
+      $('valueInput').style.display = isCompound ? 'none' : 'block';
+      $('compoundFields').classList.toggle('visible', isCompound);
+      convert();
+    }
+    $('fromUnit').onchange = handleFromChange;
+    $('toUnit').onchange = () => { $('resultUnit').textContent = LABELS[$('toUnit').value]; convert(); };
+
+    function convert() {
+      let val = $('fromUnit').value === 'feet-inches'
+        ? (parseFloat($('feetInput').value) || 0) + (parseFloat($('inchesInput').value) || 0) / 12
+        : parseFloat($('valueInput').value) || 0;
+      const table = convType === 'length' ? LENGTH_CM : WEIGHT_G;
+      const factor = $('fromUnit').value === 'feet-inches' ? table.feet : table[$('fromUnit').value];
+      const result = (val * factor) / table[$('toUnit').value];
+      $('resultValue').textContent = result >= 1e6 ? (result/1e6).toFixed(2)+'M' : result >= 1e3 ? (result/1e3).toFixed(2)+'K' : result < 0.01 && result > 0 ? result.toExponential(2) : result.toFixed(2);
+      $('resultUnit').textContent = LABELS[$('toUnit').value];
+    }
+
+    $('valueInput').oninput = convert;
+    $('feetInput').oninput = convert;
+    $('inchesInput').oninput = convert;
+    $('feetInput').onkeydown = e => { if (e.key === 'Tab') { e.preventDefault(); $('inchesInput').focus(); }};
+    $('swapBtn').onclick = () => {
+      if ($('fromUnit').value === 'feet-inches') return;
+      [$('fromUnit').value, $('toUnit').value] = [$('toUnit').value, $('fromUnit').value];
+      handleFromChange();
+    };
+    $('copyBtn').onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(`${$('resultValue').textContent} ${$('resultUnit').textContent}`);
+        $('copyBtn').textContent = '✓ Copied!';
+        setTimeout(() => $('copyBtn').textContent = '📋 Copy Result', 1500);
+      } catch {}
+    };
+    populateUnits();
+  </script>
+</body>
+</html>

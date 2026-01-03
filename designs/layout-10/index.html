@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convert 5'11" to Bananas | Banana for Scale</title>
+  <meta name="description" content="5 feet 11 inches = 10.14 bananas. Use our converter to measure anything in bananas.">
+
+  <!-- SEO: Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{
+      "@type": "Question",
+      "name": "How many bananas is 5 feet 11 inches?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "5 feet 11 inches equals approximately 10.14 bananas, using the standard banana length of 17.78 cm (7 inches)."
+      }
+    }]
+  }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    /*
+      LAYOUT 10: CENTERED WIDESCREEN WITH STICKY ADS
+      - Full-width centered converter
+      - Sticky sidebar ads
+      - Below-fold SEO content
+      - Clean, focused UX
+    */
+    :root {
+      --bg: #F4F4F5;
+      --bg-alt: #FFFFFF;
+      --card: #FFFFFF;
+      --text: #18181B;
+      --text-secondary: #52525B;
+      --text-muted: #A1A1AA;
+      --border: #E4E4E7;
+      --accent: #F59E0B;
+      --accent-hover: #D97706;
+      --accent-light: #FEF3C7;
+      --ad-bg: #E4E4E7;
+    }
+    [data-theme="dark"] {
+      --bg: #09090B;
+      --bg-alt: #18181B;
+      --card: #18181B;
+      --text: #FAFAFA;
+      --text-secondary: #A1A1AA;
+      --text-muted: #71717A;
+      --border: #27272A;
+      --accent: #FBBF24;
+      --accent-hover: #F59E0B;
+      --accent-light: #422006;
+      --ad-bg: #27272A;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 60px;
+    }
+    .logo {
+      font-size: 1.125rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .logo span { color: var(--text-muted); font-weight: 400; }
+    .header-ad {
+      background: var(--ad-bg);
+      padding: 0.25rem 2rem;
+      border-radius: 4px;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    .header-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .type-toggle {
+      display: flex;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .type-toggle button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .type-toggle button.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .theme-btn {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    /* Main Layout */
+    .main-wrapper {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: calc(100vh - 60px);
+    }
+    /* Sticky Ad Sidebars */
+    .ad-sidebar {
+      width: 160px;
+      flex-shrink: 0;
+      padding: 1rem 0.5rem;
+    }
+    .ad-sidebar .sticky-ad {
+      position: sticky;
+      top: 80px;
+    }
+    .ad-placeholder {
+      background: var(--ad-bg);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 1rem;
+    }
+    .ad-sidebar .ad-placeholder {
+      width: 140px;
+      height: 600px;
+    }
+    /* Center Content */
+    .center-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Converter Section */
+    .converter-section {
+      background: var(--bg-alt);
+      padding: 3rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+    }
+    .converter-box {
+      width: 100%;
+      max-width: 700px;
+    }
+    .converter-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .converter-title h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .converter-title p {
+      color: var(--text-secondary);
+    }
+    /* Converter UI */
+    .converter-ui {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      gap: 1rem;
+      align-items: end;
+      margin-bottom: 1.5rem;
+    }
+    .field-group label {
+      display: block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .value-input {
+      width: 100%;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      text-align: center;
+    }
+    .value-input:focus { border-color: var(--accent); }
+    .value-input::placeholder { color: var(--text-muted); }
+    /* Compound */
+    .compound-wrapper { display: none; }
+    .compound-wrapper.visible { display: block; }
+    .compound-fields {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .compound-fields .field { flex: 1; position: relative; }
+    .compound-fields input {
+      width: 100%;
+      padding: 1rem 2rem 1rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      text-align: center;
+    }
+    .compound-fields input:focus { border-color: var(--accent); }
+    .compound-fields .suffix {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .unit-select {
+      width: 100%;
+      padding: 0.75rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 0.75rem;
+    }
+    .swap-col {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 1.75rem;
+    }
+    .swap-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .swap-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(180deg);
+    }
+    /* Result */
+    .result-field {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+    .result-field .unit-select {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(0,0,0,0.1);
+      color: #000;
+    }
+    .result-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 1rem;
+      background: var(--accent);
+      border-radius: 12px;
+      color: #000;
+    }
+    /* Actions */
+    .actions-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 0.875rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .action-btn.primary {
+      background: var(--text);
+      border-color: var(--text);
+      color: var(--bg);
+    }
+    .action-btn.primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+    /* SEO Content */
+    .seo-section {
+      padding: 4rem 2rem;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+    }
+    .seo-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .seo-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .seo-section h3 {
+      font-size: 1.125rem;
+      margin: 2rem 0 0.75rem;
+    }
+    .seo-section p {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    .seo-section ul {
+      padding-left: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+    .seo-section li { margin-bottom: 0.5rem; }
+    .inline-ad {
+      background: var(--ad-bg);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 2rem 0;
+      text-align: center;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    /* Footer */
+    footer {
+      background: var(--bg-alt);
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+    }
+    .footer-ad {
+      background: var(--ad-bg);
+      border: 2px dashed var(--border);
+      padding: 0.5rem 3rem;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 1rem;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    .footer-text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .ad-sidebar { display: none; }
+    }
+    @media (max-width: 768px) {
+      .header-ad { display: none; }
+      .input-row { grid-template-columns: 1fr; gap: 0.75rem; }
+      .swap-col {
+        padding: 0.5rem 0;
+        justify-content: center;
+      }
+      .swap-btn { transform: rotate(90deg); }
+      .swap-btn:hover { transform: rotate(270deg); }
+      .converter-section { padding: 2rem 1rem; min-height: auto; }
+      .converter-ui { padding: 1.5rem; }
+      .value-input, .result-display { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">🍌 Banana <span>for</span> Scale</div>
+      <div class="header-ad">Ad: 468x60</div>
+      <div class="header-actions">
+        <div class="type-toggle">
+          <button class="active" data-type="length">Length</button>
+          <button data-type="weight">Weight</button>
+        </div>
+        <button class="theme-btn" id="themeBtn">☀️</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    <!-- Left Ad -->
+    <aside class="ad-sidebar">
+      <div class="sticky-ad">
+        <div class="ad-placeholder">Ad<br>160x600</div>
+      </div>
+    </aside>
+
+    <!-- Center -->
+    <main class="center-content">
+      <section class="converter-section">
+        <div class="converter-box">
+          <div class="converter-title">
+            <h1>Convert to Bananas</h1>
+            <p>The universal unit of measurement</p>
+          </div>
+
+          <div class="converter-ui">
+            <div class="input-row">
+              <div class="field-group">
+                <label>From</label>
+                <div id="singleInput">
+                  <input type="number" class="value-input" id="valueInput" placeholder="0" value="5.92">
+                </div>
+                <div class="compound-wrapper" id="compoundWrapper">
+                  <div class="compound-fields">
+                    <div class="field">
+                      <input type="number" id="feetInput" value="5">
+                      <span class="suffix">ft</span>
+                    </div>
+                    <div class="field">
+                      <input type="number" id="inchesInput" value="11">
+                      <span class="suffix">in</span>
+                    </div>
+                  </div>
+                </div>
+                <select class="unit-select" id="fromUnit"></select>
+              </div>
+
+              <div class="swap-col">
+                <button class="swap-btn" id="swapBtn">⇄</button>
+              </div>
+
+              <div class="field-group result-field">
+                <label style="color: rgba(0,0,0,0.5)">To</label>
+                <div class="result-display" id="resultDisplay">10.14</div>
+                <select class="unit-select" id="toUnit"></select>
+              </div>
+            </div>
+
+            <div class="actions-row">
+              <button class="action-btn" id="clearBtn">Clear</button>
+              <button class="action-btn" id="shareBtn">Share</button>
+              <button class="action-btn primary" id="copyBtn">📋 Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEO Content -->
+      <article class="seo-section">
+        <div class="seo-inner">
+          <h2>How Many Bananas is 5'11"?</h2>
+          <p><strong>5 feet 11 inches equals approximately 10.14 bananas.</strong> This measurement uses the standard banana length of 17.78 centimeters (about 7 inches), which is the average size of a medium Cavendish banana.</p>
+
+          <div class="inline-ad">Ad: 728x90</div>
+
+          <h3>The Math Behind It</h3>
+          <p>To convert height to bananas:</p>
+          <ul>
+            <li>5 feet 11 inches = 180.34 centimeters</li>
+            <li>180.34 cm ÷ 17.78 cm (banana length) = 10.14 bananas</li>
+          </ul>
+
+          <h3>Why Measure in Bananas?</h3>
+          <p>The "banana for scale" concept started as an internet phenomenon where people would include bananas in photos to give viewers a sense of an object's size. It's since become a fun, relatable way to understand measurements.</p>
+
+          <div class="inline-ad">Ad: 300x250</div>
+
+          <h3>More Banana Conversions</h3>
+          <ul>
+            <li>Average doorway (6'8"): 11.4 bananas</li>
+            <li>NBA regulation hoop (10'): 17.1 bananas</li>
+            <li>School bus (~35'): 60 bananas</li>
+            <li>Statue of Liberty (305'): 521 bananas</li>
+          </ul>
+        </div>
+      </article>
+
+      <footer>
+        <div class="footer-ad">Ad: 728x90</div>
+        <p class="footer-text">© 2024 Banana for Scale • 1 banana ≈ 17.78 cm</p>
+      </footer>
+    </main>
+
+    <!-- Right Ad -->
+    <aside class="ad-sidebar">
+      <div class="sticky-ad">
+        <div class="ad-placeholder">Ad<br>160x600</div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const BANANA_CM = 17.78, BANANA_G = 118;
+    const LENGTH_CM = { bananas: BANANA_CM, inches: 2.54, feet: 30.48, 'feet-inches': 30.48, yards: 91.44, miles: 160934.4, mm: 0.1, cm: 1, m: 100, km: 100000 };
+    const WEIGHT_G = { bananas: BANANA_G, oz: 28.3495, lb: 453.592, tons: 907185, g: 1, kg: 1000, 'metric-tons': 1000000 };
+    const LABELS = { bananas: 'bananas', inches: 'in', feet: 'ft', 'feet-inches': 'ft & in', yards: 'yd', miles: 'mi', mm: 'mm', cm: 'cm', m: 'm', km: 'km', oz: 'oz', lb: 'lb', tons: 'tons', g: 'g', kg: 'kg', 'metric-tons': 't' };
+
+    let convType = 'length', dark = localStorage.getItem('theme') === 'dark';
+    const $ = id => document.getElementById(id);
+
+    function setTheme(d) {
+      document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      $('themeBtn').textContent = d ? '🌙' : '☀️';
+      localStorage.setItem('theme', d ? 'dark' : 'light');
+    }
+    setTheme(dark);
+    $('themeBtn').onclick = () => { dark = !dark; setTheme(dark); };
+
+    document.querySelectorAll('.type-toggle button').forEach(btn => btn.onclick = () => {
+      document.querySelectorAll('.type-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      convType = btn.dataset.type;
+      populateUnits();
+    });
+
+    function populateUnits() {
+      const lengthOpts = '<option value="feet-inches">Feet & Inches</option><option value="bananas">Bananas</option><option value="inches">Inches</option><option value="feet">Feet</option><option value="cm">Centimeters</option><option value="m">Meters</option><option value="yards">Yards</option><option value="miles">Miles</option><option value="mm">Millimeters</option><option value="km">Kilometers</option>';
+      const lengthToOpts = '<option value="bananas">Bananas</option><option value="cm">Centimeters</option><option value="m">Meters</option><option value="inches">Inches</option><option value="feet">Feet</option><option value="yards">Yards</option><option value="miles">Miles</option><option value="mm">Millimeters</option><option value="km">Kilometers</option>';
+      const weightOpts = '<option value="kg">Kilograms</option><option value="bananas">Bananas</option><option value="lb">Pounds</option><option value="oz">Ounces</option><option value="g">Grams</option><option value="tons">Tons</option><option value="metric-tons">Metric Tons</option>';
+      const weightToOpts = '<option value="bananas">Bananas</option><option value="g">Grams</option><option value="kg">Kilograms</option><option value="lb">Pounds</option><option value="oz">Ounces</option><option value="tons">Tons</option><option value="metric-tons">Metric Tons</option>';
+      if (convType === 'length') {
+        $('fromUnit').innerHTML = lengthOpts;
+        $('toUnit').innerHTML = lengthToOpts;
+      } else {
+        $('fromUnit').innerHTML = weightOpts;
+        $('toUnit').innerHTML = weightToOpts;
+      }
+      handleFromChange();
+    }
+
+    function handleFromChange() {
+      const isCompound = $('fromUnit').value === 'feet-inches';
+      $('singleInput').style.display = isCompound ? 'none' : 'block';
+      $('compoundWrapper').classList.toggle('visible', isCompound);
+      convert();
+    }
+    $('fromUnit').onchange = handleFromChange;
+    $('toUnit').onchange = convert;
+
+    function convert() {
+      let val = $('fromUnit').value === 'feet-inches'
+        ? (parseFloat($('feetInput').value) || 0) + (parseFloat($('inchesInput').value) || 0) / 12
+        : parseFloat($('valueInput').value) || 0;
+      const table = convType === 'length' ? LENGTH_CM : WEIGHT_G;
+      const factor = $('fromUnit').value === 'feet-inches' ? table.feet : table[$('fromUnit').value];
+      const result = (val * factor) / table[$('toUnit').value];
+      $('resultDisplay').textContent = result >= 1e6 ? (result/1e6).toFixed(2)+'M' : result >= 1e3 ? (result/1e3).toFixed(2)+'K' : result < 0.01 && result > 0 ? result.toExponential(2) : result.toFixed(2);
+    }
+
+    $('valueInput').oninput = convert;
+    $('feetInput').oninput = convert;
+    $('inchesInput').oninput = convert;
+    $('feetInput').onkeydown = e => { if (e.key === 'Tab') { e.preventDefault(); $('inchesInput').focus(); }};
+
+    $('swapBtn').onclick = () => {
+      if ($('fromUnit').value === 'feet-inches') return;
+      [$('fromUnit').value, $('toUnit').value] = [$('toUnit').value, $('fromUnit').value];
+      handleFromChange();
+    };
+    $('clearBtn').onclick = () => {
+      $('valueInput').value = '';
+      $('feetInput').value = '';
+      $('inchesInput').value = '';
+      convert();
+    };
+    $('shareBtn').onclick = () => {
+      const url = `${location.origin}${location.pathname}?from=${$('fromUnit').value}&to=${$('toUnit').value}&v=${$('fromUnit').value === 'feet-inches' ? $('feetInput').value + '-' + $('inchesInput').value : $('valueInput').value}`;
+      navigator.clipboard?.writeText(url);
+      $('shareBtn').textContent = '✓ Link copied!';
+      setTimeout(() => $('shareBtn').textContent = 'Share', 1500);
+    };
+    $('copyBtn').onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(`${$('resultDisplay').textContent} ${LABELS[$('toUnit').value]}`);
+        $('copyBtn').textContent = '✓ Copied!';
+        setTimeout(() => $('copyBtn').textContent = '📋 Copy', 1500);
+      } catch {}
+    };
+
+    populateUnits();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banana for Scale - Universal Unit Converter</title>
+  <meta name="description" content="Convert any measurement to bananas. The universal unit converter that finally makes sense.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Banana for Scale",
+    "url": "https://bananaforscale.info",
+    "description": "Universal unit converter using bananas as measurement",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090B;
+      --bg-elevated: #18181B;
+      --bg-card: #27272A;
+      --bg-input: #1F1F23;
+      --text: #FAFAFA;
+      --text-secondary: #A1A1AA;
+      --text-muted: #71717A;
+      --border: #3F3F46;
+      --accent: #FBBF24;
+      --accent-dim: #92400E;
+      --accent-soft: rgba(251, 191, 36, 0.1);
+      --ad-bg: #1F1F23;
+      --from-color: #3B82F6;
+      --from-soft: rgba(59, 130, 246, 0.1);
+      --to-color: #FBBF24;
+      --to-soft: rgba(251, 191, 36, 0.15);
+    }
+    [data-theme="light"] {
+      --bg: #FAFAFA;
+      --bg-elevated: #FFFFFF;
+      --bg-card: #F4F4F5;
+      --bg-input: #FFFFFF;
+      --text: #18181B;
+      --text-secondary: #52525B;
+      --text-muted: #A1A1AA;
+      --border: #E4E4E7;
+      --accent: #F59E0B;
+      --accent-dim: #FEF3C7;
+      --accent-soft: rgba(245, 158, 11, 0.1);
+      --ad-bg: #E4E4E7;
+      --from-color: #2563EB;
+      --from-soft: rgba(37, 99, 235, 0.08);
+      --to-color: #F59E0B;
+      --to-soft: rgba(245, 158, 11, 0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+    .app-shell {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      grid-template-columns: 240px 1fr 300px;
+      height: 100%;
+    }
+    /* Top Bar */
+    .top-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 60px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 10;
+    }
+    .logo { font-size: 1.125rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .logo span { color: var(--text-muted); font-weight: 400; }
+    .top-ad {
+      background: var(--ad-bg);
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+      padding: 0.5rem 2rem;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    .top-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .theme-btn, .menu-btn {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .menu-btn {
+      display: none;
+    }
+    /* Mobile Menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem;
+      z-index: 9;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    .mobile-menu.visible {
+      display: block;
+    }
+    .mobile-menu-section {
+      margin-bottom: 1rem;
+    }
+    .mobile-menu-section:last-child {
+      margin-bottom: 0;
+    }
+    .mobile-menu-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .mobile-menu-options {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .mobile-menu-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mobile-menu-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+    /* Sidebar */
+    .sidebar {
+      background: var(--bg-elevated);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+    .sidebar-section { }
+    .sidebar-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding: 0 0.75rem;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      width: 100%;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .nav-item:hover { background: var(--bg-card); color: var(--text); }
+    .nav-item.active { background: var(--accent); color: #000; }
+    .nav-item .icon { font-size: 1.125rem; }
+    .sidebar-ad {
+      margin-top: auto;
+      background: var(--ad-bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    /* Main Area */
+    .main-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-y: auto;
+      position: relative;
+    }
+    /* Particle Canvas */
+    .particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Converter */
+    .converter-app {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    /* Section: From */
+    .convert-section {
+      padding: 1.25rem;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 0.625rem;
+      border-radius: 4px;
+    }
+    .section-from .section-label {
+      color: var(--from-color);
+      background: var(--from-soft);
+    }
+    .section-to .section-label {
+      color: var(--to-color);
+      background: var(--to-soft);
+    }
+    /* Value Display */
+    .value-display {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value-input {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      outline: none;
+      min-width: 0;
+    }
+    .value-input::placeholder { color: var(--text-muted); }
+    .value-unit {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    /* Compound Input */
+    .compound-row {
+      display: none;
+      gap: 0.75rem;
+    }
+    .compound-row.visible { display: flex; }
+    .compound-field {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+    }
+    .compound-field:focus-within {
+      border-color: var(--from-color);
+    }
+    .compound-field input {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      background: transparent;
+      border: none;
+      outline: none;
+      min-width: 0;
+      width: 100%;
+    }
+    .compound-field input::placeholder {
+      color: var(--text-muted);
+    }
+    .compound-field .suffix {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    /* Unit Grid */
+    .unit-container {
+      position: relative;
+    }
+    .units-popular {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+    }
+    .units-popular .unit-btn {
+      flex: 1;
+      min-width: 0;
+    }
+    .units-expanded {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .units-expanded.visible {
+      display: block;
+    }
+    .units-popular {
+      animation: fadeIn 0.2s ease;
+    }
+    .units-popular.hidden {
+      display: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .unit-section {
+      margin-bottom: 0.75rem;
+    }
+    .unit-section:last-child {
+      margin-bottom: 0;
+    }
+    .unit-system-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.375rem;
+      padding-left: 0.125rem;
+    }
+    .unit-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.375rem;
+    }
+    .more-units-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .more-units-btn:hover {
+      border-color: var(--text-secondary);
+      color: var(--text-secondary);
+    }
+    .more-units-btn .arrow {
+      transition: transform 0.2s;
+    }
+    .more-units-btn.expanded .arrow {
+      transform: rotate(180deg);
+    }
+    .unit-btn {
+      padding: 0.625rem 0.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .unit-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+    .section-from .unit-btn.active {
+      background: var(--from-color);
+      border-color: var(--from-color);
+      color: #fff;
+    }
+    .section-to .unit-btn.active {
+      background: var(--to-color);
+      border-color: var(--to-color);
+      color: #000;
+    }
+    /* Swap Divider */
+    .swap-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .swap-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .swap-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .swap-btn .icon {
+      font-size: 1rem;
+      transition: transform 0.3s;
+    }
+    .swap-btn:hover .icon {
+      transform: rotate(180deg);
+    }
+    /* Result Section */
+    .section-to {
+      background: var(--to-soft);
+    }
+    .section-to .value-display {
+      background: var(--bg-elevated);
+      border-color: var(--to-color);
+    }
+    .section-to .value-input {
+      color: var(--to-color);
+    }
+    /* Actions */
+    .actions-bar {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+    }
+    .action-btn {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .action-btn.primary {
+      width: 100%;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+    .action-btn.primary:hover {
+      background: var(--text);
+      border-color: var(--text);
+      color: var(--bg);
+    }
+    /* Copy Dropdown */
+    .copy-wrapper {
+      position: relative;
+      flex: 1;
+    }
+    .copy-dropdown {
+      position: absolute;
+      bottom: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: all 0.2s ease;
+      z-index: 100;
+    }
+    .copy-dropdown.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .copy-dropdown-header {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0.375rem 0.5rem 0.5rem;
+    }
+    .copy-option {
+      display: block;
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .copy-option:hover {
+      background: var(--bg-card);
+    }
+    .copy-option:active {
+      background: var(--accent-soft);
+    }
+    .copy-option .copied-feedback {
+      color: var(--accent);
+      font-family: 'DM Sans', sans-serif;
+    }
+    /* Right Panel */
+    .right-panel {
+      background: var(--bg-elevated);
+      border-left: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+    .panel-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .info-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    .info-card h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .info-card p {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .right-ad {
+      background: var(--ad-bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      color: var(--text-muted);
+    }
+    .related-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .related-item {
+      display: block;
+      padding: 0.75rem;
+      background: var(--bg-card);
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .related-item:hover { background: var(--accent-soft); color: var(--text); }
+    .related-item strong { color: var(--text); display: block; margin-bottom: 0.25rem; }
+    /* Footer */
+    .footer {
+      display: none;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+    }
+    .footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer a:hover {
+      color: var(--text);
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .footer-copy {
+      opacity: 0.7;
+    }
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .app-shell { grid-template-columns: 200px 1fr 260px; }
+    }
+    @media (max-width: 1024px) {
+      html, body {
+        height: auto;
+        min-height: 100%;
+        overflow: auto;
+      }
+      .app-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height: auto;
+        min-height: 100vh;
+      }
+      .sidebar, .right-panel { display: none; }
+      .menu-btn { display: flex; }
+      .main-area {
+        height: auto;
+        min-height: auto;
+        padding: 1.5rem 1rem;
+        justify-content: flex-start;
+        overflow: visible;
+      }
+      .particles-canvas {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100vw;
+        height: calc(100vh - 60px);
+      }
+      .converter-app {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+      }
+      .footer {
+        display: block;
+      }
+    }
+    @media (max-width: 500px) {
+      .top-bar {
+        padding: 0 1rem;
+      }
+      .top-ad { display: none; }
+      .unit-grid { grid-template-columns: repeat(3, 1fr); }
+      .value-input { font-size: 1.5rem; }
+      .compound-field input { font-size: 1.25rem; }
+      .convert-section { padding: 1rem; }
+      .actions-bar { padding: 0.75rem 1rem; }
+      .unit-section { margin-bottom: 0.5rem; }
+      .unit-system-label { font-size: 0.5625rem; margin-bottom: 0.25rem; }
+    }
+    @media (max-width: 360px) {
+      .unit-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="logo">🍌 Banana <span>for</span> Scale</div>
+      <div class="top-ad">Ad: 468x60 Banner</div>
+      <div class="top-actions">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <button class="theme-btn" id="themeBtn">☀️</button>
+      </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-label">Conversion Type</div>
+        <div class="mobile-menu-options">
+          <button class="mobile-menu-btn active" data-type="length" id="mobileLength">📏 Length</button>
+          <button class="mobile-menu-btn" data-type="weight" id="mobileWeight">⚖️ Weight</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Conversion Type</div>
+        <div class="sidebar-nav">
+          <button class="nav-item active" data-type="length"><span class="icon">📏</span> Length</button>
+          <button class="nav-item" data-type="weight"><span class="icon">⚖️</span> Weight</button>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Popular</div>
+        <div class="sidebar-nav">
+          <a class="nav-item" href="#"><span class="icon">👤</span> Human Height</a>
+          <a class="nav-item" href="#"><span class="icon">🏢</span> Buildings</a>
+          <a class="nav-item" href="#"><span class="icon">🌍</span> Distances</a>
+        </div>
+      </div>
+      <div class="sidebar-ad">Ad Space<br>160x600<br>Wide Skyscraper</div>
+    </nav>
+
+    <!-- Main Converter -->
+    <main class="main-area">
+      <canvas class="particles-canvas" id="particlesCanvas"></canvas>
+      <div class="converter-app">
+        <!-- FROM Section -->
+        <div class="convert-section section-from">
+          <div class="section-header">
+            <span class="section-label">From</span>
+          </div>
+          <div class="value-display">
+            <div class="value-row" id="singleValueRow">
+              <input type="number" class="value-input" id="valueInput" placeholder="0" value="5.92">
+              <span class="value-unit" id="fromUnitLabel">feet</span>
+            </div>
+            <div class="compound-row" id="compoundRow">
+              <div class="compound-field">
+                <input type="number" id="feetInput" placeholder="0" value="5">
+                <span class="suffix">ft</span>
+              </div>
+              <div class="compound-field">
+                <input type="number" id="inchesInput" placeholder="0" value="11">
+                <span class="suffix">in</span>
+              </div>
+            </div>
+          </div>
+          <div id="fromUnitContainer"></div>
+        </div>
+
+        <!-- Swap -->
+        <div class="swap-divider">
+          <button class="swap-btn" id="swapBtn">
+            <span class="icon">⇅</span>
+            <span>Swap</span>
+          </button>
+        </div>
+
+        <!-- TO Section -->
+        <div class="convert-section section-to">
+          <div class="section-header">
+            <span class="section-label">To</span>
+          </div>
+          <div class="value-display">
+            <div class="value-row">
+              <input type="text" class="value-input" id="resultValue" value="10.14" readonly>
+              <span class="value-unit" id="toUnitLabel">bananas</span>
+            </div>
+          </div>
+          <div id="toUnitContainer"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-bar">
+          <button class="action-btn" id="clearBtn">Clear</button>
+          <div class="copy-wrapper">
+            <div class="copy-dropdown" id="copyDropdown">
+              <div class="copy-dropdown-header">Copy as...</div>
+              <div id="copyOptions"></div>
+            </div>
+            <button class="action-btn primary" id="copyBtn">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Right Panel -->
+    <aside class="right-panel">
+      <div>
+        <div class="panel-title">Quick Info</div>
+        <div class="info-card">
+          <h3>Banana Standard</h3>
+          <p>We use 17.78 cm (7 in) as the average banana length — the typical size of a medium Cavendish banana.</p>
+        </div>
+      </div>
+      <div class="right-ad">Ad Space<br>300x250<br>Medium Rectangle</div>
+      <div>
+        <div class="panel-title">Related Conversions</div>
+        <div class="related-list">
+          <a class="related-item" href="#"><strong>6 feet to bananas</strong>10.29 bananas</a>
+          <a class="related-item" href="#"><strong>5 feet 10 inches</strong>10.00 bananas</a>
+          <a class="related-item" href="#"><strong>180 cm to bananas</strong>10.12 bananas</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Footer (mobile only) -->
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-copy">© 2025 Banana for Scale. All rights reserved.</div>
+    </footer>
+  </div>
+
+  <script>
+    const BANANA_CM = 17.78, BANANA_G = 118;
+    const LENGTH_CM = { bananas: BANANA_CM, inches: 2.54, feet: 30.48, 'feet-inches': 30.48, yards: 91.44, miles: 160934.4, mm: 0.1, cm: 1, m: 100, km: 100000 };
+    const WEIGHT_G = { bananas: BANANA_G, oz: 28.3495, lb: 453.592, tons: 907185, g: 1, kg: 1000, 'metric-tons': 1000000 };
+
+    const LENGTH_FROM = {
+      universal: [
+        { key: 'bananas', label: '🍌 Banana' },
+      ],
+      imperial: [
+        { key: 'feet-inches', label: 'Feet & In' },
+        { key: 'feet', label: 'Feet' },
+        { key: 'inches', label: 'Inches' },
+        { key: 'yards', label: 'Yards' },
+      ],
+      metric: [
+        { key: 'cm', label: 'cm' },
+        { key: 'm', label: 'Meters' },
+        { key: 'km', label: 'km' },
+      ],
+    };
+    const LENGTH_TO = {
+      universal: [
+        { key: 'bananas', label: '🍌 Banana' },
+      ],
+      imperial: [
+        { key: 'feet', label: 'Feet' },
+        { key: 'inches', label: 'Inches' },
+        { key: 'yards', label: 'Yards' },
+        { key: 'miles', label: 'Miles' },
+      ],
+      metric: [
+        { key: 'cm', label: 'cm' },
+        { key: 'm', label: 'Meters' },
+        { key: 'km', label: 'km' },
+      ],
+    };
+    const WEIGHT_FROM = {
+      universal: [
+        { key: 'bananas', label: '🍌 Banana' },
+      ],
+      imperial: [
+        { key: 'oz', label: 'Ounces' },
+        { key: 'lb', label: 'Pounds' },
+        { key: 'tons', label: 'Tons' },
+      ],
+      metric: [
+        { key: 'g', label: 'Grams' },
+        { key: 'kg', label: 'kg' },
+      ],
+    };
+    const WEIGHT_TO = {
+      universal: [
+        { key: 'bananas', label: '🍌 Banana' },
+      ],
+      imperial: [
+        { key: 'oz', label: 'Ounces' },
+        { key: 'lb', label: 'Pounds' },
+        { key: 'tons', label: 'Tons' },
+      ],
+      metric: [
+        { key: 'g', label: 'Grams' },
+        { key: 'kg', label: 'kg' },
+      ],
+    };
+
+    // Popular units shown by default (compact view)
+    const POPULAR_LENGTH_FROM = [
+      { key: 'bananas', label: '🍌 Banana' },
+      { key: 'feet-inches', label: 'Feet & In' },
+      { key: 'cm', label: 'cm' },
+      { key: 'm', label: 'Meters' },
+    ];
+    const POPULAR_LENGTH_TO = [
+      { key: 'bananas', label: '🍌 Banana' },
+      { key: 'feet', label: 'Feet' },
+      { key: 'cm', label: 'cm' },
+      { key: 'm', label: 'Meters' },
+    ];
+    const POPULAR_WEIGHT_FROM = [
+      { key: 'bananas', label: '🍌 Banana' },
+      { key: 'lb', label: 'Pounds' },
+      { key: 'kg', label: 'kg' },
+      { key: 'g', label: 'Grams' },
+    ];
+    const POPULAR_WEIGHT_TO = [
+      { key: 'bananas', label: '🍌 Banana' },
+      { key: 'lb', label: 'Pounds' },
+      { key: 'kg', label: 'kg' },
+      { key: 'g', label: 'Grams' },
+    ];
+
+    const UNIT_LABELS = {
+      bananas: 'bananas', inches: 'inches', feet: 'feet', 'feet-inches': 'ft & in',
+      yards: 'yards', miles: 'miles', mm: 'mm', cm: 'cm', m: 'meters', km: 'km',
+      oz: 'ounces', lb: 'pounds', tons: 'tons', g: 'grams', kg: 'kg', 'metric-tons': 't'
+    };
+
+    // Track expanded state for each section
+    let fromExpanded = false;
+    let toExpanded = false;
+
+    let convType = 'length';
+    let fromUnit = 'feet-inches';
+    let toUnit = 'bananas';
+    let dark = localStorage.getItem('theme') !== 'light';
+
+    const $ = id => document.getElementById(id);
+
+    // Theme
+    function setTheme(d) {
+      document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      $('themeBtn').textContent = d ? '🌙' : '☀️';
+      localStorage.setItem('theme', d ? 'dark' : 'light');
+    }
+    setTheme(dark);
+    $('themeBtn').onclick = () => { dark = !dark; setTheme(dark); };
+
+    // Type switching (shared function)
+    function switchConversionType(type) {
+      convType = type;
+      fromUnit = convType === 'length' ? 'feet-inches' : 'kg';
+      toUnit = 'bananas';
+      fromExpanded = false;
+      toExpanded = false;
+      renderUnits();
+      updateUI();
+      // Update all buttons
+      document.querySelectorAll('.nav-item[data-type]').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+      document.querySelectorAll('.mobile-menu-btn[data-type]').forEach(b => b.classList.toggle('active', b.dataset.type === type));
+    }
+
+    // Desktop sidebar type switching
+    document.querySelectorAll('.nav-item[data-type]').forEach(btn => {
+      btn.onclick = () => switchConversionType(btn.dataset.type);
+    });
+
+    // Mobile menu toggle
+    let mobileMenuOpen = false;
+    $('menuBtn').onclick = () => {
+      mobileMenuOpen = !mobileMenuOpen;
+      $('mobileMenu').classList.toggle('visible', mobileMenuOpen);
+      $('menuBtn').textContent = mobileMenuOpen ? '✕' : '☰';
+    };
+
+    // Mobile type switching
+    document.querySelectorAll('.mobile-menu-btn[data-type]').forEach(btn => {
+      btn.onclick = () => {
+        switchConversionType(btn.dataset.type);
+        // Close menu after selection
+        mobileMenuOpen = false;
+        $('mobileMenu').classList.remove('visible');
+        $('menuBtn').textContent = '☰';
+      };
+    });
+
+    // Render a single unit section (for expanded view)
+    function renderUnitSection(units, selectedUnit, label) {
+      return `
+        <div class="unit-section">
+          <div class="unit-system-label">${label}</div>
+          <div class="unit-grid">
+            ${units.map(u =>
+              `<button class="unit-btn ${u.key === selectedUnit ? 'active' : ''}" data-unit="${u.key}">${u.label}</button>`
+            ).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Render popular units (compact view)
+    function renderPopularUnits(units, selectedUnit) {
+      return units.map(u =>
+        `<button class="unit-btn ${u.key === selectedUnit ? 'active' : ''}" data-unit="${u.key}">${u.label}</button>`
+      ).join('');
+    }
+
+    // Render unit container with both views
+    function renderUnitContainer(containerId, popularUnits, allUnits, selectedUnit, isExpanded, toggleId) {
+      const container = $(containerId);
+
+      // Check if selected unit is in popular list
+      const selectedInPopular = popularUnits.some(u => u.key === selectedUnit);
+      const shouldShowExpanded = isExpanded || !selectedInPopular;
+
+      container.innerHTML = `
+        <div class="units-popular ${shouldShowExpanded ? 'hidden' : ''}">
+          ${renderPopularUnits(popularUnits, selectedUnit)}
+        </div>
+        <div class="units-expanded ${shouldShowExpanded ? 'visible' : ''}">
+          ${renderUnitSection(allUnits.universal, selectedUnit, 'Universal')}
+          ${renderUnitSection(allUnits.imperial, selectedUnit, 'Imperial')}
+          ${renderUnitSection(allUnits.metric, selectedUnit, 'Metric')}
+        </div>
+        <button class="more-units-btn ${shouldShowExpanded ? 'expanded' : ''}" id="${toggleId}">
+          <span>${shouldShowExpanded ? 'Show less' : 'More units'}</span>
+          <span class="arrow">▼</span>
+        </button>
+      `;
+
+      return shouldShowExpanded;
+    }
+
+    // Render unit grids
+    function renderUnits() {
+      const fromAllUnits = convType === 'length' ? LENGTH_FROM : WEIGHT_FROM;
+      const toAllUnits = convType === 'length' ? LENGTH_TO : WEIGHT_TO;
+      const fromPopular = convType === 'length' ? POPULAR_LENGTH_FROM : POPULAR_WEIGHT_FROM;
+      const toPopular = convType === 'length' ? POPULAR_LENGTH_TO : POPULAR_WEIGHT_TO;
+
+      // Render FROM units
+      fromExpanded = renderUnitContainer('fromUnitContainer', fromPopular, fromAllUnits, fromUnit, fromExpanded, 'fromToggle');
+
+      // Render TO units
+      toExpanded = renderUnitContainer('toUnitContainer', toPopular, toAllUnits, toUnit, toExpanded, 'toToggle');
+
+      // From unit click handlers
+      $('fromUnitContainer').querySelectorAll('.unit-btn').forEach(btn => {
+        btn.onclick = () => {
+          fromUnit = btn.dataset.unit;
+          renderUnits();
+          updateUI();
+        };
+      });
+
+      // To unit click handlers
+      $('toUnitContainer').querySelectorAll('.unit-btn').forEach(btn => {
+        btn.onclick = () => {
+          toUnit = btn.dataset.unit;
+          renderUnits();
+          convert();
+        };
+      });
+
+      // Toggle handlers
+      $('fromToggle').onclick = () => {
+        fromExpanded = !fromExpanded;
+        renderUnits();
+      };
+      $('toToggle').onclick = () => {
+        toExpanded = !toExpanded;
+        renderUnits();
+      };
+    }
+
+    // Update UI based on selected units
+    function updateUI() {
+      const isCompound = fromUnit === 'feet-inches';
+      $('singleValueRow').style.display = isCompound ? 'none' : 'flex';
+      $('compoundRow').classList.toggle('visible', isCompound);
+      $('fromUnitLabel').textContent = UNIT_LABELS[fromUnit] || fromUnit;
+      $('toUnitLabel').textContent = UNIT_LABELS[toUnit] || toUnit;
+      convert();
+    }
+
+    // Conversion
+    function convert() {
+      let val;
+      if (fromUnit === 'feet-inches') {
+        const ft = parseFloat($('feetInput').value) || 0;
+        const inc = parseFloat($('inchesInput').value) || 0;
+        val = ft + inc / 12;
+      } else {
+        val = parseFloat($('valueInput').value) || 0;
+      }
+
+      const table = convType === 'length' ? LENGTH_CM : WEIGHT_G;
+      const fromFactor = fromUnit === 'feet-inches' ? table.feet : table[fromUnit];
+      const base = val * fromFactor;
+      const result = base / table[toUnit];
+
+      let formatted;
+      if (result >= 1e6) formatted = (result / 1e6).toFixed(2) + 'M';
+      else if (result >= 1e3) formatted = (result / 1e3).toFixed(2) + 'K';
+      else if (result < 0.01 && result > 0) formatted = result.toExponential(2);
+      else formatted = result.toFixed(2);
+
+      $('resultValue').value = formatted;
+      $('toUnitLabel').textContent = UNIT_LABELS[toUnit] || toUnit;
+    }
+
+    // Input handlers
+    $('valueInput').oninput = convert;
+    $('feetInput').oninput = convert;
+    $('inchesInput').oninput = convert;
+
+    // Tab between feet/inches
+    $('feetInput').onkeydown = e => {
+      if (e.key === 'Tab' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        $('inchesInput').focus();
+        $('inchesInput').select();
+      }
+    };
+    $('inchesInput').onkeydown = e => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        $('feetInput').focus();
+        $('feetInput').select();
+      }
+    };
+
+    // Helper to flatten unit groups
+    function flattenUnits(unitGroups) {
+      return [...unitGroups.universal, ...unitGroups.imperial, ...unitGroups.metric];
+    }
+
+    // Swap
+    $('swapBtn').onclick = () => {
+      if (fromUnit === 'feet-inches') return; // Can't swap compound
+      const newFrom = toUnit;
+      const newTo = fromUnit;
+      // Check if swap is valid (toUnit must exist in from options)
+      const fromUnits = flattenUnits(convType === 'length' ? LENGTH_FROM : WEIGHT_FROM);
+      const toUnits = flattenUnits(convType === 'length' ? LENGTH_TO : WEIGHT_TO);
+      if (fromUnits.some(u => u.key === newFrom) && toUnits.some(u => u.key === newTo)) {
+        fromUnit = newFrom;
+        toUnit = newTo;
+        renderUnits();
+        updateUI();
+      }
+    };
+
+    // Clear
+    $('clearBtn').onclick = () => {
+      $('valueInput').value = '';
+      $('feetInput').value = '';
+      $('inchesInput').value = '';
+      convert();
+    };
+
+    // Copy dropdown
+    let copyDropdownOpen = false;
+
+    function getInputString() {
+      if (fromUnit === 'feet-inches') {
+        const ft = $('feetInput').value || '0';
+        const inc = $('inchesInput').value || '0';
+        return `${ft}ft ${inc}in`;
+      }
+      return `${$('valueInput').value || '0'} ${UNIT_LABELS[fromUnit]}`;
+    }
+
+    function getOutputString() {
+      return `${$('resultValue').value} ${UNIT_LABELS[toUnit]}`;
+    }
+
+    function getCopyOptions() {
+      const input = getInputString();
+      const output = getOutputString();
+      const outputValue = $('resultValue').value;
+
+      return [
+        { label: outputValue, value: outputValue },
+        { label: output, value: output },
+        { label: `${output} = ${input}`, value: `${output} = ${input}` },
+        { label: input, value: input },
+        { label: `${input} = ${output}`, value: `${input} = ${output}` },
+      ];
+    }
+
+    function renderCopyOptions() {
+      const options = getCopyOptions();
+      $('copyOptions').innerHTML = options.map(opt =>
+        `<button class="copy-option" data-value="${opt.value.replace(/"/g, '&quot;')}">${opt.label}</button>`
+      ).join('');
+
+      $('copyOptions').querySelectorAll('.copy-option').forEach(btn => {
+        btn.onclick = async (e) => {
+          e.stopPropagation();
+          const text = btn.dataset.value;
+          try {
+            await navigator.clipboard.writeText(text);
+            btn.innerHTML = '<span class="copied-feedback">✓ Copied!</span>';
+            setTimeout(() => {
+              closeCopyDropdown();
+            }, 800);
+          } catch (err) {
+            console.error('Copy failed', err);
+          }
+        };
+      });
+    }
+
+    function openCopyDropdown() {
+      renderCopyOptions();
+      $('copyDropdown').classList.add('visible');
+      copyDropdownOpen = true;
+    }
+
+    function closeCopyDropdown() {
+      $('copyDropdown').classList.remove('visible');
+      copyDropdownOpen = false;
+    }
+
+    $('copyBtn').onclick = (e) => {
+      e.stopPropagation();
+      if (copyDropdownOpen) {
+        closeCopyDropdown();
+      } else {
+        openCopyDropdown();
+      }
+    };
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (copyDropdownOpen && !e.target.closest('.copy-wrapper')) {
+        closeCopyDropdown();
+      }
+    });
+
+    // Initialize
+    renderUnits();
+    updateUI();
+
+    // ========== PARTICLE SYSTEM ==========
+    const canvas = $('particlesCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId;
+
+    // Load banana image
+    const bananaImg = new Image();
+    bananaImg.src = 'banana.png';
+    let bananaLoaded = false;
+    bananaImg.onload = () => { bananaLoaded = true; };
+
+    // Particle types: 'banana', 'circle', 'circle-empty', 'square', 'square-empty', 'triangle', 'triangle-empty', 'dot'
+    const PARTICLE_TYPES = [
+      { type: 'dot', weight: 25 },
+      { type: 'circle-empty', weight: 15 },
+      { type: 'square', weight: 12 },
+      { type: 'square-empty', weight: 12 },
+      { type: 'triangle', weight: 10 },
+      { type: 'triangle-empty', weight: 10 },
+      { type: 'circle', weight: 8 },
+      { type: 'banana', weight: 8 },
+    ];
+
+    function getRandomType() {
+      const total = PARTICLE_TYPES.reduce((sum, p) => sum + p.weight, 0);
+      let rand = Math.random() * total;
+      for (const p of PARTICLE_TYPES) {
+        rand -= p.weight;
+        if (rand <= 0) return p.type;
+      }
+      return 'dot';
+    }
+
+    // Neutral colors for particles
+    function getParticleColor(type) {
+      const neutralsDark = ['#3F3F46', '#52525B', '#71717A', '#A1A1AA'];
+      const neutralsLight = ['#D4D4D8', '#A1A1AA', '#71717A', '#52525B'];
+      const accentDark = '#FBBF24';
+      const accentLight = '#F59E0B';
+
+      if (type === 'banana') {
+        return null; // Banana uses emoji
+      }
+
+      // 20% chance for accent color, 80% neutral
+      if (Math.random() < 0.2) {
+        return dark ? accentDark : accentLight;
+      }
+      const neutrals = dark ? neutralsDark : neutralsLight;
+      return neutrals[Math.floor(Math.random() * neutrals.length)];
+    }
+
+    function resizeCanvas() {
+      const main = document.querySelector('.main-area');
+      canvas.width = main.offsetWidth;
+      canvas.height = main.offsetHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.type = getRandomType();
+        this.color = getParticleColor(this.type);
+
+        // Size based on type
+        if (this.type === 'banana') {
+          this.size = Math.random() * 6 + 14; // 14-20px for emoji
+          this.opacity = Math.random() * 0.25 + 0.15;
+        } else if (this.type === 'dot') {
+          this.size = Math.random() * 3 + 1.5;
+          this.opacity = Math.random() * 0.4 + 0.15;
+        } else {
+          this.size = Math.random() * 6 + 4;
+          this.opacity = Math.random() * 0.3 + 0.1;
+        }
+
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.015;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.rotation += this.rotationSpeed;
+
+        // Wrap around edges
+        const buffer = 30;
+        if (this.x < -buffer) this.x = canvas.width + buffer;
+        if (this.x > canvas.width + buffer) this.x = -buffer;
+        if (this.y < -buffer) this.y = canvas.height + buffer;
+        if (this.y > canvas.height + buffer) this.y = -buffer;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.globalAlpha = this.opacity;
+
+        const s = this.size;
+
+        switch (this.type) {
+          case 'banana':
+            // Draw banana image
+            if (bananaLoaded) {
+              const aspectRatio = bananaImg.width / bananaImg.height;
+              const h = s;
+              const w = h * aspectRatio;
+              ctx.drawImage(bananaImg, -w/2, -h/2, w, h);
+            }
+            break;
+
+          case 'dot':
+            ctx.beginPath();
+            ctx.arc(0, 0, s, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            break;
+
+          case 'circle':
+            ctx.beginPath();
+            ctx.arc(0, 0, s, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            break;
+
+          case 'circle-empty':
+            ctx.beginPath();
+            ctx.arc(0, 0, s, 0, Math.PI * 2);
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            break;
+
+          case 'square':
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-s/2, -s/2, s, s);
+            break;
+
+          case 'square-empty':
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(-s/2, -s/2, s, s);
+            break;
+
+          case 'triangle':
+            ctx.beginPath();
+            ctx.moveTo(0, -s * 0.6);
+            ctx.lineTo(s * 0.5, s * 0.4);
+            ctx.lineTo(-s * 0.5, s * 0.4);
+            ctx.closePath();
+            ctx.fillStyle = this.color;
+            ctx.fill();
+            break;
+
+          case 'triangle-empty':
+            ctx.beginPath();
+            ctx.moveTo(0, -s * 0.6);
+            ctx.lineTo(s * 0.5, s * 0.4);
+            ctx.lineTo(-s * 0.5, s * 0.4);
+            ctx.closePath();
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            break;
+        }
+
+        ctx.restore();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const area = canvas.width * canvas.height;
+      const count = Math.min(Math.floor(area / 15000), 50);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      animationId = requestAnimationFrame(animateParticles);
+    }
+
+    function startParticles() {
+      resizeCanvas();
+      initParticles();
+      if (animationId) cancelAnimationFrame(animationId);
+      animateParticles();
+    }
+
+    // Start particles
+    startParticles();
+
+    // Handle resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(startParticles, 150);
+    });
+
+    // Reinitialize particles when theme changes to update colors
+    const originalSetTheme = setTheme;
+    setTheme = function(d) {
+      originalSetTheme(d);
+      // Reinit particles for new colors
+      particles.forEach(p => {
+        if (p.type !== 'banana') {
+          p.color = getParticleColor(p.type);
+        }
+      });
+    };
+  </script>
+</body>
+</html>

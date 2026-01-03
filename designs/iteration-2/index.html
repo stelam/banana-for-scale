@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banana for Scale - Universal Unit Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light theme */
+      --bg-primary: #FDF6E3;
+      --bg-secondary: #F5ECD7;
+      --bg-tertiary: #EDE4CC;
+      --text-primary: #2D2518;
+      --text-secondary: #5C4D38;
+      --text-muted: #8B7B66;
+      --accent-primary: #F5C842;
+      --accent-secondary: #E8B730;
+      --accent-glow: rgba(245, 200, 66, 0.4);
+      --border-color: rgba(45, 37, 24, 0.1);
+      --shadow-sm: 0 2px 8px rgba(45, 37, 24, 0.06);
+      --shadow-md: 0 8px 24px rgba(45, 37, 24, 0.1);
+      --shadow-lg: 0 16px 48px rgba(45, 37, 24, 0.12);
+      --particle-color: rgba(245, 200, 66, 0.15);
+      --input-bg: #FFFFFF;
+      --card-bg: rgba(255, 255, 255, 0.7);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #1A1612;
+      --bg-secondary: #252019;
+      --bg-tertiary: #2F2820;
+      --text-primary: #F5ECD7;
+      --text-secondary: #C4B69E;
+      --text-muted: #8B7B66;
+      --accent-primary: #F5C842;
+      --accent-secondary: #FFD85C;
+      --accent-glow: rgba(245, 200, 66, 0.25);
+      --border-color: rgba(245, 236, 215, 0.1);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+      --particle-color: rgba(245, 200, 66, 0.08);
+      --input-bg: #2F2820;
+      --card-bg: rgba(37, 32, 25, 0.8);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+
+    /* Particle Background */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Layout */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      position: relative;
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .logo-text {
+      font-family: 'Fraunces', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-text span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      position: relative;
+      width: 56px;
+      height: 32px;
+      background: var(--bg-tertiary);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .theme-toggle:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toggle-thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    [data-theme="dark"] .toggle-thumb {
+      transform: translateX(24px);
+    }
+
+    .toggle-icon {
+      font-size: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    [data-theme="dark"] .toggle-icon {
+      transform: rotate(360deg);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 2rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Converter Card */
+    .converter-card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .converter-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg), 0 0 60px var(--accent-glow);
+    }
+
+    /* Conversion Type Tabs */
+    .conversion-tabs {
+      display: flex;
+      background: var(--bg-secondary);
+      padding: 0.5rem;
+      gap: 0.25rem;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 0.875rem 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-secondary);
+    }
+
+    .tab-btn.active {
+      color: var(--text-primary);
+      background: var(--input-bg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-btn .tab-icon {
+      margin-right: 0.5rem;
+    }
+
+    /* Converter Body */
+    .converter-body {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Input Section */
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .input-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: stretch;
+    }
+
+    .input-field-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 1.125rem 1.25rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--input-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Feet & Inches Compound Input */
+    .compound-input {
+      display: flex;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .compound-input .input-field-wrapper {
+      position: relative;
+    }
+
+    .compound-input .input-field {
+      padding-right: 3rem;
+    }
+
+    .compound-suffix {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      pointer-events: none;
+    }
+
+    /* Unit Selector */
+    .unit-selector {
+      position: relative;
+      min-width: 140px;
+    }
+
+    .unit-select {
+      width: 100%;
+      height: 100%;
+      padding: 1rem 2.5rem 1rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      transition: all 0.3s ease;
+    }
+
+    .unit-select:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    .unit-selector::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      font-size: 0.75rem;
+    }
+
+    /* Swap Button & Divider */
+    .swap-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0.5rem 0;
+    }
+
+    .swap-divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .swap-btn {
+      position: relative;
+      z-index: 1;
+      width: 48px;
+      height: 48px;
+      background: var(--input-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+    }
+
+    .swap-btn:hover {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+      transform: rotate(180deg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .swap-btn:active {
+      transform: rotate(180deg) scale(0.95);
+    }
+
+    /* Result Section */
+    .result-section {
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      min-height: 120px;
+      transition: all 0.4s ease;
+    }
+
+    .result-section.converting {
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--accent-glow) 100%);
+    }
+
+    .banana-visual {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      flex-shrink: 0;
+    }
+
+    .banana-svg {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .result-section:hover .banana-svg {
+      transform: rotate(-5deg) scale(1.05);
+    }
+
+    .result-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .result-value {
+      font-family: 'Fraunces', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .result-value .result-number {
+      transition: all 0.4s ease;
+    }
+
+    .result-value .result-unit {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .result-equivalent {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .result-target-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .result-target-selector .unit-select {
+      padding: 0.5rem 2rem 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      background: var(--input-bg);
+      min-width: 120px;
+    }
+
+    .result-target-selector .unit-selector {
+      min-width: auto;
+    }
+
+    .result-target-selector .unit-selector::after {
+      right: 0.75rem;
+    }
+
+    /* Copy Hint */
+    .copy-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+    }
+
+    .result-section:hover .copy-hint {
+      opacity: 1;
+    }
+
+    .copy-hint:hover {
+      color: var(--accent-primary);
+    }
+
+    .copy-hint.copied {
+      color: var(--accent-primary);
+      opacity: 1;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-btn {
+      padding: 0.5rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-btn:hover {
+      color: var(--text-primary);
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .footer-text a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-text a:hover {
+      color: var(--accent-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header {
+        padding: 1rem 1.25rem;
+      }
+
+      .nav-link {
+        display: none;
+      }
+
+      .main-content {
+        padding: 1rem;
+        gap: 1.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .converter-body {
+        padding: 1.25rem;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .unit-selector {
+        min-width: 100%;
+      }
+
+      .unit-select {
+        padding: 1rem 2.5rem 1rem 1rem;
+      }
+
+      .result-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.25rem;
+      }
+
+      .banana-visual {
+        width: 80px;
+        height: 80px;
+      }
+
+      .result-value {
+        font-size: 2rem;
+        justify-content: center;
+      }
+
+      .result-target-selector {
+        justify-content: center;
+      }
+
+      .quick-actions {
+        justify-content: center;
+      }
+    }
+
+    /* Animation keyframes */
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 var(--accent-glow);
+      }
+      50% {
+        box-shadow: 0 0 20px 10px var(--accent-glow);
+      }
+    }
+
+    @keyframes bounce-in {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.02);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes number-pop {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .number-update {
+      animation: number-pop 0.3s ease;
+    }
+
+    /* Initial load animation */
+    .converter-card {
+      animation: bounce-in 0.6s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <!-- Particle Canvas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-text">Banana <span>for</span> Scale</span>
+      </div>
+      <nav class="nav-actions">
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link">History</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <div class="toggle-thumb">
+            <span class="toggle-icon">☀️</span>
+          </div>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero -->
+      <section class="hero">
+        <h1 class="hero-title">Measure Everything in Bananas</h1>
+        <p class="hero-subtitle">The universal unit converter that finally makes sense. Because sometimes you just need perspective.</p>
+      </section>
+
+      <!-- Converter -->
+      <div class="converter-card">
+        <!-- Tabs -->
+        <div class="conversion-tabs">
+          <button class="tab-btn active" data-type="length">
+            <span class="tab-icon">📏</span>Length
+          </button>
+          <button class="tab-btn" data-type="weight">
+            <span class="tab-icon">⚖️</span>Weight
+          </button>
+        </div>
+
+        <!-- Converter Body -->
+        <div class="converter-body">
+          <!-- Input Section -->
+          <div class="input-section">
+            <label class="input-label">Convert from</label>
+            <div class="input-row">
+              <!-- Standard Input (default) -->
+              <div class="input-field-wrapper" id="standardInputWrapper">
+                <input type="number" class="input-field" id="inputValue" placeholder="0" value="5.92">
+              </div>
+              <!-- Compound Input for feet & inches (hidden by default) -->
+              <div class="compound-input" id="compoundInputWrapper" style="display: none;">
+                <div class="input-field-wrapper">
+                  <input type="number" class="input-field" id="feetInput" placeholder="0" value="5">
+                  <span class="compound-suffix">ft</span>
+                </div>
+                <div class="input-field-wrapper">
+                  <input type="number" class="input-field" id="inchesInput" placeholder="0" value="11">
+                  <span class="compound-suffix">in</span>
+                </div>
+              </div>
+              <div class="unit-selector">
+                <select class="unit-select" id="fromUnit">
+                  <option value="bananas">🍌 Bananas</option>
+                  <option value="inches">Inches</option>
+                  <option value="feet">Feet</option>
+                  <option value="feet-inches" selected>Feet & Inches</option>
+                  <option value="yards">Yards</option>
+                  <option value="miles">Miles</option>
+                  <option value="mm">Millimeters</option>
+                  <option value="cm">Centimeters</option>
+                  <option value="m">Meters</option>
+                  <option value="km">Kilometers</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Swap Divider -->
+          <div class="swap-divider">
+            <button class="swap-btn" id="swapBtn" aria-label="Swap units">
+              ⇅
+            </button>
+          </div>
+
+          <!-- Result Section -->
+          <div class="result-section" id="resultSection">
+            <div class="banana-visual">
+              <svg class="banana-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Banana body -->
+                <path d="M75 25C85 35 90 55 80 75C70 95 45 95 25 85C15 80 10 70 15 55C20 40 35 30 55 25C65 22 70 20 75 25Z" fill="#FFE135" stroke="#E6C52D" stroke-width="2"/>
+                <!-- Banana tip -->
+                <ellipse cx="22" cy="82" rx="5" ry="4" fill="#8B6914" transform="rotate(-30 22 82)"/>
+                <!-- Banana highlights -->
+                <path d="M60 35C70 40 75 50 72 65" stroke="#FFF5BA" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+                <path d="M45 40C55 42 65 50 65 60" stroke="#FFF5BA" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+                <!-- Brown spots for character -->
+                <circle cx="55" cy="55" r="2" fill="#C4A54D" opacity="0.3"/>
+                <circle cx="62" cy="48" r="1.5" fill="#C4A54D" opacity="0.2"/>
+                <circle cx="48" cy="62" r="1" fill="#C4A54D" opacity="0.25"/>
+              </svg>
+            </div>
+            <div class="result-content">
+              <div class="result-value">
+                <span class="result-number" id="resultNumber">10.2</span>
+                <span class="result-unit" id="resultUnitLabel">bananas</span>
+              </div>
+              <div class="result-target-selector">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">to</span>
+                <div class="unit-selector">
+                  <select class="unit-select" id="toUnit">
+                    <option value="bananas" selected>🍌 Bananas</option>
+                    <option value="inches">Inches</option>
+                    <option value="feet">Feet</option>
+                    <option value="yards">Yards</option>
+                    <option value="miles">Miles</option>
+                    <option value="mm">Millimeters</option>
+                    <option value="cm">Centimeters</option>
+                    <option value="m">Meters</option>
+                    <option value="km">Kilometers</option>
+                  </select>
+                </div>
+              </div>
+              <span class="result-equivalent" id="resultEquivalent">5 ft 11 in = ~180 cm</span>
+              <span class="copy-hint" id="copyHint">Click to copy</span>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <button class="quick-btn" data-value="1.8" data-unit="m">Average human height</button>
+            <button class="quick-btn" data-value="443" data-unit="m">Empire State Building</button>
+            <button class="quick-btn" data-value="384400" data-unit="km">Distance to Moon</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer-text">Made with 🍌 by <a href="#">@bananaforscale</a> · One banana ≈ 17.78 cm</p>
+    </footer>
+  </div>
+
+  <script>
+    // === Constants ===
+    const BANANA_LENGTH_CM = 17.78; // Average banana length in cm
+    const BANANA_WEIGHT_G = 118; // Average banana weight in grams
+
+    // Length conversions to cm
+    const LENGTH_TO_CM = {
+      'bananas': BANANA_LENGTH_CM,
+      'inches': 2.54,
+      'feet': 30.48,
+      'feet-inches': 30.48, // Base is feet
+      'yards': 91.44,
+      'miles': 160934.4,
+      'mm': 0.1,
+      'cm': 1,
+      'm': 100,
+      'km': 100000
+    };
+
+    // Weight conversions to grams
+    const WEIGHT_TO_G = {
+      'bananas': BANANA_WEIGHT_G,
+      'oz': 28.3495,
+      'lb': 453.592,
+      'tons': 907185,
+      'g': 1,
+      'kg': 1000,
+      'metric-tons': 1000000
+    };
+
+    const UNIT_LABELS = {
+      'bananas': 'bananas',
+      'inches': 'inches',
+      'feet': 'feet',
+      'feet-inches': 'ft & in',
+      'yards': 'yards',
+      'miles': 'miles',
+      'mm': 'mm',
+      'cm': 'cm',
+      'm': 'm',
+      'km': 'km',
+      'oz': 'oz',
+      'lb': 'lb',
+      'tons': 'tons',
+      'g': 'g',
+      'kg': 'kg',
+      'metric-tons': 't'
+    };
+
+    // === State ===
+    let currentType = 'length';
+    let isDark = false;
+
+    // === DOM Elements ===
+    const themeToggle = document.getElementById('themeToggle');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const fromUnitSelect = document.getElementById('fromUnit');
+    const toUnitSelect = document.getElementById('toUnit');
+    const inputValue = document.getElementById('inputValue');
+    const feetInput = document.getElementById('feetInput');
+    const inchesInput = document.getElementById('inchesInput');
+    const standardInputWrapper = document.getElementById('standardInputWrapper');
+    const compoundInputWrapper = document.getElementById('compoundInputWrapper');
+    const resultNumber = document.getElementById('resultNumber');
+    const resultUnitLabel = document.getElementById('resultUnitLabel');
+    const resultEquivalent = document.getElementById('resultEquivalent');
+    const resultSection = document.getElementById('resultSection');
+    const swapBtn = document.getElementById('swapBtn');
+    const copyHint = document.getElementById('copyHint');
+    const quickBtns = document.querySelectorAll('.quick-btn');
+
+    // === Theme Toggle ===
+    themeToggle.addEventListener('click', () => {
+      isDark = !isDark;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      toggleIcon.textContent = isDark ? '🌙' : '☀️';
+    });
+
+    // === Tab Switching ===
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentType = btn.dataset.type;
+        updateUnitOptions();
+        convert();
+      });
+    });
+
+    // === Update Unit Options ===
+    function updateUnitOptions() {
+      const lengthOptions = `
+        <option value="bananas">🍌 Bananas</option>
+        <option value="inches">Inches</option>
+        <option value="feet">Feet</option>
+        <option value="feet-inches">Feet & Inches</option>
+        <option value="yards">Yards</option>
+        <option value="miles">Miles</option>
+        <option value="mm">Millimeters</option>
+        <option value="cm">Centimeters</option>
+        <option value="m">Meters</option>
+        <option value="km">Kilometers</option>
+      `;
+
+      const lengthTargetOptions = `
+        <option value="bananas">🍌 Bananas</option>
+        <option value="inches">Inches</option>
+        <option value="feet">Feet</option>
+        <option value="yards">Yards</option>
+        <option value="miles">Miles</option>
+        <option value="mm">Millimeters</option>
+        <option value="cm">Centimeters</option>
+        <option value="m">Meters</option>
+        <option value="km">Kilometers</option>
+      `;
+
+      const weightOptions = `
+        <option value="bananas">🍌 Bananas</option>
+        <option value="oz">Ounces</option>
+        <option value="lb">Pounds</option>
+        <option value="tons">Short Tons</option>
+        <option value="g">Grams</option>
+        <option value="kg">Kilograms</option>
+        <option value="metric-tons">Metric Tons</option>
+      `;
+
+      if (currentType === 'length') {
+        fromUnitSelect.innerHTML = lengthOptions;
+        toUnitSelect.innerHTML = lengthTargetOptions;
+      } else {
+        fromUnitSelect.innerHTML = weightOptions;
+        toUnitSelect.innerHTML = weightOptions;
+      }
+
+      handleUnitChange();
+    }
+
+    // === Handle feet-inches compound input ===
+    function handleUnitChange() {
+      const fromUnit = fromUnitSelect.value;
+
+      if (fromUnit === 'feet-inches') {
+        standardInputWrapper.style.display = 'none';
+        compoundInputWrapper.style.display = 'flex';
+      } else {
+        standardInputWrapper.style.display = 'block';
+        compoundInputWrapper.style.display = 'none';
+      }
+
+      convert();
+    }
+
+    fromUnitSelect.addEventListener('change', handleUnitChange);
+    toUnitSelect.addEventListener('change', convert);
+
+    // === Conversion Logic ===
+    function convert() {
+      const fromUnit = fromUnitSelect.value;
+      const toUnit = toUnitSelect.value;
+      let value;
+
+      if (fromUnit === 'feet-inches') {
+        const feet = parseFloat(feetInput.value) || 0;
+        const inches = parseFloat(inchesInput.value) || 0;
+        value = feet + (inches / 12);
+      } else {
+        value = parseFloat(inputValue.value) || 0;
+      }
+
+      let result;
+      let equivalentText = '';
+
+      if (currentType === 'length') {
+        // Convert to cm first, then to target unit
+        const fromFactor = fromUnit === 'feet-inches' ? LENGTH_TO_CM['feet'] : LENGTH_TO_CM[fromUnit];
+        const valueInCm = value * fromFactor;
+        const toFactor = LENGTH_TO_CM[toUnit];
+        result = valueInCm / toFactor;
+
+        // Generate equivalent text
+        if (fromUnit === 'feet-inches') {
+          const feet = parseInt(feetInput.value) || 0;
+          const inches = parseFloat(inchesInput.value) || 0;
+          equivalentText = `${feet} ft ${inches} in = ~${Math.round(valueInCm)} cm`;
+        } else {
+          equivalentText = `${value} ${UNIT_LABELS[fromUnit]} = ~${Math.round(valueInCm)} cm`;
+        }
+      } else {
+        // Weight conversion
+        const fromFactor = WEIGHT_TO_G[fromUnit];
+        const valueInG = value * fromFactor;
+        const toFactor = WEIGHT_TO_G[toUnit];
+        result = valueInG / toFactor;
+
+        equivalentText = `${value} ${UNIT_LABELS[fromUnit]} = ~${Math.round(valueInG)} g`;
+      }
+
+      // Format result
+      let formattedResult;
+      if (result >= 1000000) {
+        formattedResult = (result / 1000000).toFixed(2) + 'M';
+      } else if (result >= 1000) {
+        formattedResult = (result / 1000).toFixed(2) + 'K';
+      } else if (result < 0.01 && result > 0) {
+        formattedResult = result.toExponential(2);
+      } else {
+        formattedResult = result.toFixed(2);
+      }
+
+      // Update UI with animation
+      resultNumber.classList.add('number-update');
+      setTimeout(() => resultNumber.classList.remove('number-update'), 300);
+
+      resultNumber.textContent = formattedResult;
+      resultUnitLabel.textContent = UNIT_LABELS[toUnit];
+      resultEquivalent.textContent = equivalentText;
+    }
+
+    // === Input Event Listeners ===
+    inputValue.addEventListener('input', convert);
+    feetInput.addEventListener('input', convert);
+    inchesInput.addEventListener('input', convert);
+
+    // Tab between feet and inches with arrow keys
+    feetInput.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Tab') {
+        e.preventDefault();
+        inchesInput.focus();
+        inchesInput.select();
+      }
+    });
+
+    inchesInput.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        feetInput.focus();
+        feetInput.select();
+      }
+    });
+
+    // === Swap Units ===
+    swapBtn.addEventListener('click', () => {
+      const fromValue = fromUnitSelect.value;
+      const toValue = toUnitSelect.value;
+
+      // Can't swap if from is feet-inches (special case)
+      if (fromValue === 'feet-inches') return;
+
+      // Check if toValue exists in fromUnit options
+      const fromOptions = Array.from(fromUnitSelect.options).map(o => o.value);
+      const toOptions = Array.from(toUnitSelect.options).map(o => o.value);
+
+      if (fromOptions.includes(toValue) && toOptions.includes(fromValue)) {
+        fromUnitSelect.value = toValue;
+        toUnitSelect.value = fromValue;
+        handleUnitChange();
+      }
+    });
+
+    // === Copy Result ===
+    resultSection.addEventListener('click', async () => {
+      const text = `${resultNumber.textContent} ${resultUnitLabel.textContent}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyHint.textContent = 'Copied!';
+        copyHint.classList.add('copied');
+        setTimeout(() => {
+          copyHint.textContent = 'Click to copy';
+          copyHint.classList.remove('copied');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+
+    // === Quick Actions ===
+    quickBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value = parseFloat(btn.dataset.value);
+        const unit = btn.dataset.unit;
+
+        // Set appropriate type
+        if (['m', 'km', 'cm', 'mm'].includes(unit)) {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          document.querySelector('[data-type="length"]').classList.add('active');
+          currentType = 'length';
+          updateUnitOptions();
+        }
+
+        fromUnitSelect.value = unit;
+        handleUnitChange();
+        inputValue.value = value;
+        toUnitSelect.value = 'bananas';
+        convert();
+      });
+    });
+
+    // === Particle System ===
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.5 + 0.1;
+        this.hue = Math.random() * 20 + 40; // Yellow-ish hues
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+
+      draw() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        const baseOpacity = theme === 'dark' ? this.opacity * 0.5 : this.opacity;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 80%, 60%, ${baseOpacity})`;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+      for (let i = 0; i < Math.min(particleCount, 100); i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    animateParticles();
+
+    // Initial conversion
+    handleUnitChange();
+  </script>
+</body>
+</html>

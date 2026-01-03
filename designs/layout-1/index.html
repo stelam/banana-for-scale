@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layout 1: Minimal Vertical Flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /*
+      LAYOUT 1: MINIMAL VERTICAL FLOW
+      - Ultra-clean single column
+      - Large touch targets
+      - Clear visual hierarchy: Input → Result
+      - Mobile-first, scales beautifully
+    */
+    :root {
+      --bg: #FAFAF9;
+      --card: #FFFFFF;
+      --text: #1C1917;
+      --text-secondary: #57534E;
+      --text-muted: #A8A29E;
+      --border: #E7E5E4;
+      --accent: #F59E0B;
+      --accent-light: #FEF3C7;
+      --radius: 16px;
+    }
+    [data-theme="dark"] {
+      --bg: #1C1917;
+      --card: #292524;
+      --text: #FAFAF9;
+      --text-secondary: #D6D3D1;
+      --text-muted: #78716C;
+      --border: #44403C;
+      --accent: #FBBF24;
+      --accent-light: #422006;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0 1.5rem;
+    }
+    .logo {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .logo span { color: var(--text-muted); font-weight: 400; }
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 1.125rem;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); }
+    /* Type Selector */
+    .type-selector {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .type-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .type-btn:hover { border-color: var(--text-muted); }
+    .type-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+    /* Main Card */
+    .converter-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Input Section */
+    .input-section {
+      margin-bottom: 1.5rem;
+    }
+    .input-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .value-input {
+      width: 100%;
+      padding: 1rem;
+      font-family: inherit;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 0.75rem;
+    }
+    .value-input:focus { border-color: var(--accent); }
+    .value-input::placeholder { color: var(--text-muted); }
+    /* Compound Input */
+    .compound-row {
+      display: none;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .compound-row.visible { display: flex; }
+    .compound-field {
+      flex: 1;
+      position: relative;
+    }
+    .compound-field input {
+      width: 100%;
+      padding: 1rem 2.5rem 1rem 1rem;
+      font-family: inherit;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+    }
+    .compound-field input:focus { border-color: var(--accent); }
+    .compound-suffix {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    /* Unit Select */
+    .unit-select-wrapper {
+      position: relative;
+    }
+    .unit-select {
+      width: 100%;
+      padding: 1rem 2.5rem 1rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .unit-select:focus { border-color: var(--accent); }
+    .unit-select-wrapper::after {
+      content: '▼';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 0;
+    }
+    .swap-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--card);
+      cursor: pointer;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      display: grid;
+      place-items: center;
+    }
+    .swap-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(180deg);
+    }
+    /* Result Section */
+    .result-section {
+      background: var(--accent-light);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .result-section:hover { opacity: 0.9; }
+    .result-value {
+      font-size: 3rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 0.25rem;
+    }
+    .result-unit {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .result-to {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .result-to label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .result-to select {
+      padding: 0.375rem 1.5rem 0.375rem 0.5rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      appearance: none;
+      cursor: pointer;
+    }
+    .result-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .copy-hint {
+      font-size: 0.6875rem;
+      color: var(--accent);
+      margin-top: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .result-section:hover .copy-hint { opacity: 1; }
+    /* Footer */
+    footer {
+      padding: 1rem 0;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Banana <span>for</span> Scale</div>
+      <button class="theme-toggle" id="themeToggle">☀️</button>
+    </header>
+
+    <div class="type-selector">
+      <button class="type-btn active" data-type="length">Length</button>
+      <button class="type-btn" data-type="weight">Weight</button>
+    </div>
+
+    <div class="converter-card">
+      <div class="input-section">
+        <label class="input-label">Convert</label>
+        <input type="number" class="value-input" id="valueInput" placeholder="0" value="5.92">
+        <div class="compound-row" id="compoundRow">
+          <div class="compound-field">
+            <input type="number" id="feetInput" placeholder="0" value="5">
+            <span class="compound-suffix">ft</span>
+          </div>
+          <div class="compound-field">
+            <input type="number" id="inchesInput" placeholder="0" value="11">
+            <span class="compound-suffix">in</span>
+          </div>
+        </div>
+        <div class="unit-select-wrapper">
+          <select class="unit-select" id="fromUnit"></select>
+        </div>
+      </div>
+
+      <div class="divider">
+        <button class="swap-btn" id="swapBtn">⇅</button>
+      </div>
+
+      <div class="result-section" id="resultSection">
+        <div class="result-value" id="resultValue">10.2</div>
+        <div class="result-unit" id="resultUnit">bananas</div>
+        <div class="result-to">
+          <label>to</label>
+          <select id="toUnit"></select>
+        </div>
+        <div class="result-meta" id="resultMeta">5 ft 11 in ≈ 180 cm</div>
+        <div class="copy-hint" id="copyHint">Click to copy</div>
+      </div>
+    </div>
+
+    <footer>1 banana ≈ 17.78 cm</footer>
+  </div>
+
+  <script>
+    const BANANA_CM = 17.78, BANANA_G = 118;
+    const LENGTH_CM = { bananas: BANANA_CM, inches: 2.54, feet: 30.48, 'feet-inches': 30.48, yards: 91.44, miles: 160934.4, mm: 0.1, cm: 1, m: 100, km: 100000 };
+    const WEIGHT_G = { bananas: BANANA_G, oz: 28.3495, lb: 453.592, tons: 907185, g: 1, kg: 1000, 'metric-tons': 1000000 };
+    const LABELS = { bananas: 'bananas', inches: 'in', feet: 'ft', 'feet-inches': 'ft & in', yards: 'yd', miles: 'mi', mm: 'mm', cm: 'cm', m: 'm', km: 'km', oz: 'oz', lb: 'lb', tons: 'tons', g: 'g', kg: 'kg', 'metric-tons': 't' };
+
+    let convType = 'length', dark = localStorage.getItem('theme') === 'dark';
+    const $ = id => document.getElementById(id);
+    const themeToggle = $('themeToggle'), fromUnit = $('fromUnit'), toUnit = $('toUnit');
+    const valueInput = $('valueInput'), feetInput = $('feetInput'), inchesInput = $('inchesInput');
+    const compoundRow = $('compoundRow'), resultValue = $('resultValue'), resultUnit = $('resultUnit');
+    const resultMeta = $('resultMeta'), resultSection = $('resultSection'), copyHint = $('copyHint');
+    const typeBtns = document.querySelectorAll('.type-btn'), swapBtn = $('swapBtn');
+
+    function setTheme(d) {
+      document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      themeToggle.textContent = d ? '🌙' : '☀️';
+      localStorage.setItem('theme', d ? 'dark' : 'light');
+    }
+    setTheme(dark);
+    themeToggle.onclick = () => { dark = !dark; setTheme(dark); };
+
+    typeBtns.forEach(btn => btn.onclick = () => {
+      typeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      convType = btn.dataset.type;
+      populateUnits();
+    });
+
+    function populateUnits() {
+      const lengthOpts = '<option value="bananas">🍌 Bananas</option><option value="feet-inches">Feet & Inches</option><option value="inches">Inches</option><option value="feet">Feet</option><option value="yards">Yards</option><option value="miles">Miles</option><option value="mm">Millimeters</option><option value="cm">Centimeters</option><option value="m">Meters</option><option value="km">Kilometers</option>';
+      const weightOpts = '<option value="bananas">🍌 Bananas</option><option value="oz">Ounces</option><option value="lb">Pounds</option><option value="tons">Short Tons</option><option value="g">Grams</option><option value="kg">Kilograms</option><option value="metric-tons">Metric Tons</option>';
+      if (convType === 'length') {
+        fromUnit.innerHTML = lengthOpts;
+        toUnit.innerHTML = lengthOpts.replace('<option value="feet-inches">Feet & Inches</option>', '');
+        fromUnit.value = 'feet-inches'; toUnit.value = 'bananas';
+      } else {
+        fromUnit.innerHTML = weightOpts; toUnit.innerHTML = weightOpts;
+        fromUnit.value = 'kg'; toUnit.value = 'bananas';
+      }
+      handleFromChange();
+    }
+
+    function handleFromChange() {
+      const isCompound = fromUnit.value === 'feet-inches';
+      valueInput.style.display = isCompound ? 'none' : 'block';
+      compoundRow.classList.toggle('visible', isCompound);
+      convert();
+    }
+    fromUnit.onchange = handleFromChange;
+    toUnit.onchange = convert;
+
+    function convert() {
+      let val = fromUnit.value === 'feet-inches'
+        ? (parseFloat(feetInput.value) || 0) + (parseFloat(inchesInput.value) || 0) / 12
+        : parseFloat(valueInput.value) || 0;
+
+      let result, meta;
+      if (convType === 'length') {
+        const factor = fromUnit.value === 'feet-inches' ? LENGTH_CM.feet : LENGTH_CM[fromUnit.value];
+        const cm = val * factor;
+        result = cm / LENGTH_CM[toUnit.value];
+        meta = fromUnit.value === 'feet-inches'
+          ? `${feetInput.value || 0} ft ${inchesInput.value || 0} in ≈ ${Math.round(cm)} cm`
+          : `${val} ${LABELS[fromUnit.value]} ≈ ${Math.round(cm)} cm`;
+      } else {
+        const g = val * WEIGHT_G[fromUnit.value];
+        result = g / WEIGHT_G[toUnit.value];
+        meta = `${val} ${LABELS[fromUnit.value]} ≈ ${Math.round(g)} g`;
+      }
+      resultValue.textContent = result >= 1e6 ? (result/1e6).toFixed(2)+'M' : result >= 1e3 ? (result/1e3).toFixed(2)+'K' : result < 0.01 && result > 0 ? result.toExponential(2) : result.toFixed(2);
+      resultUnit.textContent = LABELS[toUnit.value];
+      resultMeta.textContent = meta;
+    }
+
+    valueInput.oninput = convert;
+    feetInput.oninput = convert;
+    inchesInput.oninput = convert;
+    feetInput.onkeydown = e => { if (e.key === 'Tab' || e.key === 'ArrowRight') { e.preventDefault(); inchesInput.focus(); inchesInput.select(); }};
+    inchesInput.onkeydown = e => { if (e.key === 'ArrowLeft') { e.preventDefault(); feetInput.focus(); feetInput.select(); }};
+
+    swapBtn.onclick = () => {
+      if (fromUnit.value === 'feet-inches') return;
+      [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+      handleFromChange();
+    };
+
+    resultSection.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(`${resultValue.textContent} ${resultUnit.textContent}`);
+        copyHint.textContent = 'Copied!';
+        setTimeout(() => copyHint.textContent = 'Click to copy', 1500);
+      } catch {}
+    };
+
+    populateUnits();
+  </script>
+</body>
+</html>
